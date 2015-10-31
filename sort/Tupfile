@@ -8,3 +8,4 @@ include $(COMPILE_TUP)
 include $(LINK_TUP)
 
 : ./naive.o |> !linker |> naive
+: ./generate.o |> !linker |> generate
