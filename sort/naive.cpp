@@ -6,10 +6,11 @@
 #include <assert.h>
 
 int main() {
-    std::vector<std::string> strings;
 
     std::size_t num;
     std::cin >> num;
+    std::vector<std::string> strings;
+    strings.reserve(num);
     while (std::cin.good()) {
         std::string s;
         std::getline(std::cin, s, '\n');
