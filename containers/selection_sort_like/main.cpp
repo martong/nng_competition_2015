@@ -36,7 +36,7 @@ Reversals map(const Exch& e, const PalindromInBetween& palindromInbetween) {
     assert(x <= y);
     if (x == y) return {};
     if (x >= y - 2) return {{x, y}};
-    if (palindromInbetween.count(e)) return {};
+    if (palindromInbetween.count(e)) return {{x, y}};
     Reversals rev;
     rev.push_back({x, y});
     rev.push_back({x + 1, y - 1});
