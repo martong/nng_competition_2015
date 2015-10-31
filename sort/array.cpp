@@ -9,22 +9,25 @@
 int main() {
     std::size_t num;
     std::cin >> num;
+    assert(std::cin.get() == '\n');
 
     std::vector<char> array;
     array.resize(num * 65);
-    std::size_t i = 0;
     std::vector<const char*> vector;
-    vector.reserve(num);
-    while (std::cin.good()) {
-        std::string s;
-        std::getline(std::cin, s, '\n');
-        if (!s.empty()) {
-            strncpy(&array[i * 65], s.c_str(), 65);
-            vector.push_back(&array[i * 65]);
+    vector.resize(num);
+    std::size_t i = 0;
+    std::size_t index = 0;
+    vector[0] = &array[0];
+    while (std::cin.get(array[index]).good()) {
+        if (array[index] == '\n') {
+            ++i;
+            array[index] = '\0';
+            index = i * 65;
+            vector[i] = &array[index];
+        } else {
+            ++index;
         }
-        ++i;
     }
-    assert(vector.size() == num);
 
     std::cerr << "read done\n";
 
