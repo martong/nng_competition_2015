@@ -75,12 +75,12 @@ void sort(Strings& a, int lo, int hi, int d, Strings& aux) {
     // distribute
     for (int i = lo; i <= hi; i++) {
         int c = charAt(a[i], d);
-        aux[count[c+1]++] = a[i];
+        aux[count[c+1]++] = std::move(a[i]);
     }
 
     // copy back
     for (int i = lo; i <= hi; i++)
-        a[i] = aux[i - lo];
+        a[i] = std::move(aux[i - lo]);
 
 
     // recursively sort for each character (excludes sentinel -1)
