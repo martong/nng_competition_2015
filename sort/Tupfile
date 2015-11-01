@@ -11,3 +11,4 @@ include $(LINK_TUP)
 
 : ./naive.o |> !linker |> naive
 : ./array.o |> !linker |> array
+: ./msd.o |> !linker |> msd
