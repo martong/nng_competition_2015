@@ -14,8 +14,7 @@
         }                                                                      \
     while (0)
 
-
-const int R             = 256;   // extended ASCII alphabet size
+const int R             =  26;
 const int CUTOFF        =  15;   // cutoff to insertion sort
 
 using Strings = std::vector<std::string>;
@@ -33,11 +32,15 @@ void sort(Strings& a) {
     sort(a, 0, N-1, 0, aux);
 }
 
+int alphaToIndex(char c) {
+    return c - 'a';
+}
+
 // return dth character of s, -1 if d = length of string
 int charAt(const std::string& s, int d) {
     assert(d >= 0 && d <= (int)s.length());
     if (d == (int)s.length()) return -1;
-    return s[d];
+    return alphaToIndex(s[d]);
 }
 
 void insertion(Strings& a, int lo, int hi, int d);
@@ -176,4 +179,5 @@ int main() {
     assert(strings.size() == num);
     sort(strings);
     std::cout << strings;
+    return 0;
 }
