@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <thread>
 #include <future>
+#include <chrono>
 
 #define ASSERT(CONDITION)                                                      \
     do                                                                         \
@@ -190,6 +191,13 @@ int test() {
 }
 
 int main() {
+
+    using Clock = std::chrono::high_resolution_clock;
+    constexpr auto Den = Clock::period::den;
+    constexpr auto Num = Clock::period::num;
+
+    auto start = Clock::now().time_since_epoch().count();
+
     std::size_t num;
     std::cin >> num;
     Strings strings;
@@ -203,7 +211,15 @@ int main() {
     }
     std::cerr << strings.size() << '\n';
     assert(strings.size() == num);
+
+    auto read_end = Clock::now().time_since_epoch().count();
+    std::cerr << "Read took: " << (read_end - start) / double(Den) * Num << std::endl;
+
+    auto sort_start = Clock::now().time_since_epoch().count();
     sort(strings);
+    auto sort_end = Clock::now().time_since_epoch().count();
+    std::cerr << "Sort took: " << (sort_end - sort_start) / double(Den) * Num << std::endl;
+
     std::cout << strings;
     return 0;
 }
