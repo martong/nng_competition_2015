@@ -10,6 +10,8 @@
 #include <iostream>
 #include <array>
 #include <algorithm>
+#include <thread>
+#include <future>
 
 #define ASSERT(CONDITION)                                                      \
     do                                                                         \
@@ -83,9 +85,27 @@ void sort(Strings& a, int lo, int hi, int d, Strings& aux) {
         a[i] = std::move(aux[i - lo]);
 
 
-    // recursively sort for each character (excludes sentinel -1)
-    for (int r = 0; r < R; r++)
-        sort(a, lo + count[r], lo + count[r+1] - 1, d+1, aux);
+    if (d == 0) {
+        using Future = std::future<void>;
+        using Futures = std::vector<Future>;
+        Futures futures;
+        // recursively sort for each character (excludes sentinel -1)
+        for (int r = 0; r < R; r++) {
+            Strings new_aux(count[r+1] - count[r] + 1);
+            Future f = std::async(std::launch::async, [&a, &count, lo, r, d, new_aux = std::move(new_aux)]() mutable {
+                sort(a, lo + count[r], lo + count[r+1] - 1, d+1, new_aux);
+            });
+            futures.push_back(std::move(f));
+        }
+        for (auto& f : futures) {
+            f.get();
+        }
+    }
+    else {
+        for (int r = 0; r < R; r++)
+            sort(a, lo + count[r], lo + count[r+1] - 1, d+1, aux);
+    }
+
 }
 
 void exch(Strings& a, int i, int j);
