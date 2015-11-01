@@ -11,4 +11,7 @@ include $(LINK_TUP)
 
 : ./naive.o |> !linker |> naive
 : ./array.o |> !linker |> array
+
+LIBS += -lpthread
+
 : ./msd.o |> !linker |> msd
