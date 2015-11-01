@@ -9,7 +9,9 @@
 int main() {
     std::size_t num;
     std::cin >> num;
-    assert(std::cin.get() == '\n');
+    char ch = std::cin.get();
+    static_cast<void>(ch);
+    assert(ch == '\n');
 
     std::vector<char> array;
     array.resize(num * 65);
