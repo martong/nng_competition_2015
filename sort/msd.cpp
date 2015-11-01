@@ -1,3 +1,9 @@
+/**
+ * This is an MSD sort algorithm, sourced from Sedgewick's original
+ * MSD implementation for Java.
+ * See http://algs4.cs.princeton.edu/51radix/MSD.java.html
+ **/
+
 #include <string>
 #include <vector>
 #include <cassert>
