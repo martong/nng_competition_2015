@@ -207,21 +207,35 @@ int main() {
     assert(ch == '\n');
 
     std::vector<char> array;
+    //std::cin.rdbuf()->pubsetbuf(Buffer, BufSize);
     array.resize(num * 65);
     std::vector<const char*> vector;
     vector.resize(num);
     std::size_t i = 0;
     std::size_t index = 0;
     vector[0] = &array[0];
-    while (std::cin.get(array[index]).good()) {
-        if (array[index] == '\n') {
-            ++i;
-            array[index] = '\0';
-            index = i * 65;
-            vector[i] = &array[index];
-        } else {
-            ++index;
+
+    const int BufSize = 4*1024*1024;
+    std::vector<char> rBuffer(BufSize);
+    int bytesInBuffer = std::fread(&rBuffer[0], sizeof rBuffer[0],
+            rBuffer.size(), stdin);
+    while(bytesInBuffer != 0) {
+        int readFromBuffer = 0;
+        while (readFromBuffer < bytesInBuffer) {
+            array[index] = rBuffer[readFromBuffer];
+            if (array[index] == '\n') {
+                ++i;
+                array[index] = '\0';
+                // TODO cache locality
+                index = i * 65;
+                vector[i] = &array[index];
+            } else {
+                ++index;
+            }
+            ++readFromBuffer;
         }
+        bytesInBuffer = std::fread(&rBuffer[0], sizeof rBuffer[0],
+                rBuffer.size(), stdin);
     }
 
     std::cerr << "read done\n";
@@ -236,6 +250,8 @@ int main() {
 
     std::copy(vector.begin(), vector.end(),
             std::ostream_iterator<const char*>(std::cout, "\n"));
+    auto write_end = Clock::now().time_since_epoch().count();
     //std::cout << vector;
+    std::cerr << "Write took: " << (write_end - sort_end) / double(Den) * Num << std::endl;
     return 0;
 }
