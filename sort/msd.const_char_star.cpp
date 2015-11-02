@@ -40,9 +40,18 @@ int alphaToIndex(char c) {
     return c - 'a';
 }
 
+int fstrlen(const char* s) { return strlen(s); }
+//int fstrlen(const char* s) {
+    //for (int i = 0; i < 65; ++i) {
+        //if (s[i] == '\n') return i;
+    //}
+    //assert(true);
+    //return 0;
+//}
+
 // return dth character of s, -1 if d = length of string
 int charAt(const char* s, int d) {
-    const int len = strlen(s);
+    const int len = fstrlen(s);
     assert(d >= 0 && d <= len);
     if (d == len) return -1;
     return alphaToIndex(s[d]);
@@ -124,8 +133,8 @@ void exch(Strings& a, int i, int j) {
 // is v less than w, starting at character d
 bool less(const char* v, const char* w, int d) {
     // assert v.substring(0, d).equals(w.substring(0, d));
-    const int v_len = strlen(v);
-    const int w_len = strlen(w);
+    const int v_len = fstrlen(v);
+    const int w_len = fstrlen(w);
     for (int i = d; i < std::min(v_len, w_len); i++) {
         if (v[i] < w[i]) return true;
         if (v[i] > w[i]) return false;
@@ -225,9 +234,10 @@ int main() {
             array[index] = rBuffer[readFromBuffer];
             if (array[index] == '\n') {
                 ++i;
+                // We can use strlen, and check against 0 is faster than
+                // check against '\n'
                 array[index] = '\0';
-                // TODO cache locality
-                index = i * 65;
+                ++index;
                 vector[i] = &array[index];
             } else {
                 ++index;
@@ -248,10 +258,26 @@ int main() {
     auto sort_end = Clock::now().time_since_epoch().count();
     std::cerr << "Sort took: " << (sort_end - sort_start) / double(Den) * Num << std::endl;
 
-    std::copy(vector.begin(), vector.end(),
-            std::ostream_iterator<const char*>(std::cout, "\n"));
+    const int wBufSize = 4*1024*1024;
+    std::vector<char> wBuffer(wBufSize);
+    int wroteToBuffer = 0;
+    for (const char* s: vector) {
+        int i = 0;
+        while(s[i] != '\0')
+            wBuffer[wroteToBuffer++] = s[i++];
+        wBuffer[wroteToBuffer++] = '\n';
+        // TODO branch prediction hint (?)
+        if (wBufSize - wroteToBuffer - 64 < 0) {
+            std::fwrite(&wBuffer[0], sizeof wBuffer[0], wroteToBuffer, stdout);
+            wroteToBuffer = 0;
+        }
+    }
+    if (wBufSize - wroteToBuffer - 64 >= 0) {
+        std::fwrite(&wBuffer[0], sizeof wBuffer[0], wroteToBuffer, stdout);
+        wroteToBuffer = 0;
+    }
+
     auto write_end = Clock::now().time_since_epoch().count();
-    //std::cout << vector;
     std::cerr << "Write took: " << (write_end - sort_end) / double(Den) * Num << std::endl;
     return 0;
 }
