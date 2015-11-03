@@ -8,6 +8,7 @@
 #include <vector>
 
 using Table = Array<bool>;
+using Tables = std::vector<Table>;
 
 std::ostream& operator<<(std::ostream& os, const Table& array) {
     Point p;
@@ -20,11 +21,15 @@ std::ostream& operator<<(std::ostream& os, const Table& array) {
     return os;
 }
 
-void iterate(Table table, std::size_t n, Point p,
-        std::vector<Table>& result);
+void iterate(Table table, std::size_t n, Point p, Tables& result);
 
-void findNextIteration(const Table& table, std::size_t n,
-        std::vector<Table>& result) {
+void nextIteration(const Table& table, std::size_t n, Point p, Tables& result) {
+    if (!table[p]) {
+        iterate(table, n, p, result);
+    }
+}
+
+void findNextIteration(const Table& table, std::size_t n, Tables& result) {
     if (n == 0) {
         result.push_back(table);
         return;
@@ -32,24 +37,28 @@ void findNextIteration(const Table& table, std::size_t n,
 
     for (Point p : arrayRange(table)) {
         if (table[p]) {
-            if (!table[p + p10]) {
-                iterate(table, n, p + p10, result);
-            }
-            if (!table[p + p01]) {
-                iterate(table, n, p + p01, result);
-            }
+            nextIteration(table, n, p + p10, result);
+            nextIteration(table, n, p - p10, result);
+            nextIteration(table, n, p + p01, result);
+            nextIteration(table, n, p - p01, result);
         }
     }
 }
 
-void iterate(Table table, std::size_t n, Point p,
-        std::vector<Table>& result) {
+void iterateDirection(Table& table, std::size_t n, Point p, Tables& result) {
+    if (!table[p]) {
+        table[p] = true;
+        findNextIteration(table, n - 1, result);
+        table[p] = false;
+    }
+}
+
+void iterate(Table table, std::size_t n, Point p, Tables& result) {
     table[p] = true;
-    table[p + p10] = true;
-    findNextIteration(table, n - 1, result);
-    table[p + p10] = false;
-    table[p + p01] = true;
-    findNextIteration(table, n - 1, result);
+    iterateDirection(table, n, p + p10, result);
+    iterateDirection(table, n, p - p10, result);
+    iterateDirection(table, n, p + p01, result);
+    iterateDirection(table, n, p - p01, result);
 }
 
 int main(int argc, const char* argv[]) {
@@ -60,10 +69,12 @@ int main(int argc, const char* argv[]) {
 
     std::size_t numberOfTiles = boost::lexical_cast<std::size_t>(argv[1]);
 
-    std::size_t size = numberOfTiles * 2;
+    std::size_t size = numberOfTiles * 4;
+    int middle = numberOfTiles * 2;
 
-    std::vector<Table> result;
-    iterate(Table{size, size, false}, numberOfTiles, Point{0, 0}, result);
+    Tables result;
+    iterate(Table{size, size, false}, numberOfTiles, Point{middle, middle},
+            result);
 
     std::cout << result.size() << ' ' << size << '\n';
     for (const auto& element : result) {

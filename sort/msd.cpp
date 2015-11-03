@@ -13,6 +13,9 @@
 #include <thread>
 #include <future>
 #include <chrono>
+#include <iterator>
+#include <cstring>
+#include <string.h>
 
 #define ASSERT(CONDITION)                                                      \
     do                                                                         \
