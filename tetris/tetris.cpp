@@ -172,7 +172,7 @@ void finish(const Table& table, Tables& result) {
         return;
     }
 
-    if (!result.insert(croppedTable).second) {
+    if (!result.insert(std::move(croppedTable)).second) {
         return;
     }
 
