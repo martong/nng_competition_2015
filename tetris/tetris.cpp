@@ -10,17 +10,6 @@
 using Table = Array<bool>;
 using Tables = std::vector<Table>;
 
-std::ostream& operator<<(std::ostream& os, const Table& array) {
-    Point p;
-    for (p.y = 0; p.y < static_cast<int>(array.height()); ++p.y) {
-        for (p.x = 0; p.x < static_cast<int>(array.width()); ++p.x) {
-            os << (array[p] ? 'X' : ' ');
-        }
-        os << '\n';
-    }
-    return os;
-}
-
 void iterate(Table table, std::size_t n, Point p, Tables& result);
 
 void nextIteration(const Table& table, std::size_t n, Point p, Tables& result) {
@@ -100,7 +89,15 @@ int main(int argc, const char* argv[]) {
 
     std::cout << result.size() << ' ' << size << '\n';
     for (const auto& element : result) {
-        std::cout << element;
+        assert(element.width() <= static_cast<std::size_t>(middle));
+        assert(element.height() <= static_cast<std::size_t>(middle));
+        Point p;
+        for (p.y = 0; p.y < middle; ++p.y) {
+            for (p.x = 0; p.x < middle; ++p.x) {
+                std::cout << (arrayAt(element, p, false) ? 'X' : ' ');
+            }
+            std::cout << '\n';
+        }
         std::cout << "----\n";
     }
 }
