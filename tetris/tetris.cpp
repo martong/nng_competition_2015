@@ -1,14 +1,23 @@
-#include "Array.hpp"
+#include "Table.hpp"
 #include "Point.hpp"
 #include "PointRange.hpp"
+#include "floodFill.hpp"
 
 #include <boost/lexical_cast.hpp>
 
 #include <iostream>
 #include <vector>
 
-using Table = Array<bool>;
-using Tables = std::vector<Table>;
+std::ostream& operator<<(std::ostream& os, const Table& array) {
+    Point p;
+    for (p.y = 0; p.y < static_cast<int>(array.height()); ++p.y) {
+        for (p.x = 0; p.x < static_cast<int>(array.width()); ++p.x) {
+            os << (array[p] ? 'X' : ' ');
+        }
+        os << '\n';
+    }
+    return os;
+}
 
 void iterate(Table table, std::size_t n, Point p, Tables& result);
 
@@ -28,7 +37,7 @@ struct CompareData {
     Point stepY;
 };
 
-CompareData compareDatas[] = {
+const CompareData compareDatas[] = {
     {Point{0, 0}, Point{1, 0}, Point{0, 1}}, // normal
     {Point{0, 1}, Point{0, -1}, Point{1, 0}}, // left
     {Point{1, 0}, Point{0, 1}, Point{-1, 0}}, // right
@@ -75,6 +84,22 @@ bool operator==(const Table& lhs, const Table& rhs) {
     return false;
 }
 
+bool hasHole(Table table) {
+    for (Point p : arrayRange(table)) {
+        if (!table[p]) {
+            MinMax minMax = floodFill(table, p);
+            if (minMax.min.x != 0 && minMax.min.y != 0 &&
+                static_cast<std::size_t>(minMax.max.x) != table.width() - 1 &&
+                static_cast<std::size_t>(minMax.max.y) != table.height() - 1) {
+                //std::cerr << "-----" << minMax.min << " " << minMax.max << "\n" << table << "-----\n";
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 void finish(const Table& table, Tables& result) {
     Point min{static_cast<int>(table.width()), static_cast<int>(table.height())};
     Point max{0, 0};
@@ -92,6 +117,11 @@ void finish(const Table& table, Tables& result) {
 
     for (Point p : PointRange{min, max}) {
         croppedTable[p - min] = table[p];
+    }
+
+    if (hasHole(croppedTable)) {
+        //std::cerr << croppedTable << "\n";
+        return;
     }
 
     for (const Table& otherTable : result) {
