@@ -18,6 +18,39 @@ void nextIteration(const Table& table, std::size_t n, Point p, Tables& result) {
     }
 }
 
+enum class Direction {
+    normal, left, right, up
+};
+
+struct CompareData {
+    Point start;
+    Point stepX;
+    Point stepY;
+};
+
+CompareData compareDatas[] = {
+    {Point{0, 0}, Point{1, 0}, Point{0, 1}}, // normal
+    {Point{0, 1}, Point{0, -1}, Point{1, 0}}, // left
+    {Point{1, 0}, Point{0, 1}, Point{-1, 0}}, // right
+    {Point{1, 1}, Point{-1, 0}, Point{0, -1}}, // up
+};
+
+bool compare(const Table& lhs, const Table& rhs, Direction direction) {
+    const CompareData& compareData = compareDatas[static_cast<int>(direction)];
+    Point startingPoint{
+            static_cast<int>(compareData.start.x * (rhs.width() - 1)),
+            static_cast<int>(compareData.start.y * (rhs.height() - 1))};
+
+    for (Point p : arrayRange(lhs)) {
+        if (lhs[p] != rhs[startingPoint + compareData.stepX * p.x +
+                compareData.stepY * p.y]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void finish(const Table& table, Tables& result) {
     Point min{static_cast<int>(table.width()), static_cast<int>(table.height())};
     Point max{0, 0};
@@ -35,6 +68,31 @@ void finish(const Table& table, Tables& result) {
 
     for (Point p : PointRange{min, max}) {
         croppedTable[p - min] = table[p];
+    }
+
+    for (const Table& otherTable : result) {
+        if (croppedTable.width() == croppedTable.height()) {
+            if (croppedTable.width() == otherTable.width() &&
+                    croppedTable.height() == otherTable.height() && (
+                            compare(croppedTable, otherTable, Direction::normal) ||
+                            compare(croppedTable, otherTable, Direction::left) ||
+                            compare(croppedTable, otherTable, Direction::right) ||
+                            compare(croppedTable, otherTable, Direction::up))) {
+                return;
+            }
+        } else if (croppedTable.width() == otherTable.width() &&
+                croppedTable.height() == otherTable.height()) {
+            if (compare(croppedTable, otherTable, Direction::normal) ||
+                    compare(croppedTable, otherTable, Direction::up)) {
+                return;
+            }
+        } else if (croppedTable.height() == otherTable.width() &&
+                croppedTable.width() == otherTable.height()) {
+            if (compare(croppedTable, otherTable, Direction::left) ||
+                    compare(croppedTable, otherTable, Direction::right)) {
+                return;
+            }
+        }
     }
 
     result.push_back(croppedTable);
@@ -98,6 +156,5 @@ int main(int argc, const char* argv[]) {
             }
             std::cout << '\n';
         }
-        std::cout << "----\n";
     }
 }
