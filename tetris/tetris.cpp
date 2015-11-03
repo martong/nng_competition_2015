@@ -1,12 +1,48 @@
-#include "Table.hpp"
+#include "Array.hpp"
 #include "Point.hpp"
 #include "PointRange.hpp"
-#include "floodFill.hpp"
+#include "Hash.hpp"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <iostream>
 #include <vector>
+#include <unordered_set>
+
+using Table = Array<bool>;
+
+struct MinMax {
+    Point min;
+    Point max;
+};
+
+MinMax floodFill(Table& table, Point p0) {
+    std::vector<Point> pointsToVisit;
+    pointsToVisit.reserve(table.width() * table.height());
+    pointsToVisit.push_back(p0);
+
+    MinMax result{Point{static_cast<int>(table.width() - 1),
+            static_cast<int>(table.height() - 1)}, Point{0, 0}};
+    while (!pointsToVisit.empty()) {
+        Point p = pointsToVisit.back();
+        pointsToVisit.pop_back();
+
+        if (!arrayAt(table, p, true)) {
+            result.min.x = std::min(result.min.x, p.x);
+            result.min.y = std::min(result.min.y, p.y);
+            result.max.x = std::max(result.max.x, p.x);
+            result.max.y = std::max(result.max.y, p.y);
+            table[p] = true;
+            pointsToVisit.push_back(p + p10);
+            pointsToVisit.push_back(p - p10);
+            pointsToVisit.push_back(p + p01);
+            pointsToVisit.push_back(p - p01);
+        }
+    }
+
+    return result;
+}
 
 std::ostream& operator<<(std::ostream& os, const Table& array) {
     Point p;
@@ -17,14 +53,6 @@ std::ostream& operator<<(std::ostream& os, const Table& array) {
         os << '\n';
     }
     return os;
-}
-
-void iterate(Table table, std::size_t n, Point p, Tables& result);
-
-void nextIteration(const Table& table, std::size_t n, Point p, Tables& result) {
-    if (!table[p]) {
-        iterate(table, n, p, result);
-    }
 }
 
 enum class Direction {
@@ -84,6 +112,22 @@ bool operator==(const Table& lhs, const Table& rhs) {
     return false;
 }
 
+namespace std {
+
+template<>
+struct hash<Table> {
+    std::size_t operator()(const Table& table) const {
+        size_t seed = 0;
+        hash_combine(seed, table.width() * table.height());
+        hash_combine(seed, std::count(table.begin(), table.end(), true));
+        return seed;
+    }
+};
+
+}
+
+using Tables = std::unordered_set<Table>;
+
 bool hasHole(Table table) {
     for (Point p : arrayRange(table)) {
         if (!table[p]) {
@@ -100,7 +144,11 @@ bool hasHole(Table table) {
     return false;
 }
 
+static boost::posix_time::ptime start =
+        boost::posix_time::microsec_clock::universal_time();
+
 void finish(const Table& table, Tables& result) {
+    static std::size_t n = 0;
     Point min{static_cast<int>(table.width()), static_cast<int>(table.height())};
     Point max{0, 0};
     for (Point p : arrayRange(table)) {
@@ -124,13 +172,23 @@ void finish(const Table& table, Tables& result) {
         return;
     }
 
-    for (const Table& otherTable : result) {
-        if (croppedTable == otherTable) {
-            return;
-        }
+    if (!result.insert(croppedTable).second) {
+        return;
     }
 
-    result.push_back(croppedTable);
+    if (++n % 1000 == 0) {
+        boost::posix_time::ptime now =
+                boost::posix_time::microsec_clock::universal_time();
+        std::cerr << n << '(' << now - start << ")\n";
+    }
+}
+
+void iterate(Table table, std::size_t n, Point p, Tables& result);
+
+void nextIteration(const Table& table, std::size_t n, Point p, Tables& result) {
+    if (!table[p]) {
+        iterate(table, n, p, result);
+    }
 }
 
 void findNextIteration(const Table& table, std::size_t n, Tables& result) {
