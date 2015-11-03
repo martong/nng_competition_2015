@@ -51,6 +51,30 @@ bool compare(const Table& lhs, const Table& rhs, Direction direction) {
     return true;
 }
 
+bool operator==(const Table& lhs, const Table& rhs) {
+    if (lhs.width() == lhs.height()) {
+        if (lhs.width() == rhs.width() && lhs.height() == rhs.height() && (
+                compare(lhs, rhs, Direction::normal) ||
+                compare(lhs, rhs, Direction::left) ||
+                compare(lhs, rhs, Direction::right) ||
+                compare(lhs, rhs, Direction::up))) {
+            return true;
+        }
+    } else if (lhs.width() == rhs.width() && lhs.height() == rhs.height()) {
+        if (compare(lhs, rhs, Direction::normal) ||
+                compare(lhs, rhs, Direction::up)) {
+            return true;
+        }
+    } else if (lhs.height() == rhs.width() && lhs.width() == rhs.height()) {
+        if (compare(lhs, rhs, Direction::left) ||
+                compare(lhs, rhs, Direction::right)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void finish(const Table& table, Tables& result) {
     Point min{static_cast<int>(table.width()), static_cast<int>(table.height())};
     Point max{0, 0};
@@ -71,27 +95,8 @@ void finish(const Table& table, Tables& result) {
     }
 
     for (const Table& otherTable : result) {
-        if (croppedTable.width() == croppedTable.height()) {
-            if (croppedTable.width() == otherTable.width() &&
-                    croppedTable.height() == otherTable.height() && (
-                            compare(croppedTable, otherTable, Direction::normal) ||
-                            compare(croppedTable, otherTable, Direction::left) ||
-                            compare(croppedTable, otherTable, Direction::right) ||
-                            compare(croppedTable, otherTable, Direction::up))) {
-                return;
-            }
-        } else if (croppedTable.width() == otherTable.width() &&
-                croppedTable.height() == otherTable.height()) {
-            if (compare(croppedTable, otherTable, Direction::normal) ||
-                    compare(croppedTable, otherTable, Direction::up)) {
-                return;
-            }
-        } else if (croppedTable.height() == otherTable.width() &&
-                croppedTable.width() == otherTable.height()) {
-            if (compare(croppedTable, otherTable, Direction::left) ||
-                    compare(croppedTable, otherTable, Direction::right)) {
-                return;
-            }
+        if (croppedTable == otherTable) {
+            return;
         }
     }
 

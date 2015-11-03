@@ -76,11 +76,6 @@ public:
         height_ = 0;
     }
 
-    bool operator==(const Array<T>& other) const
-    {
-        return data_ == other.data_;
-    }
-
     iterator begin() { return data_.begin(); }
     iterator end() { return data_.end(); }
     const_iterator begin() const { return data_.begin(); }
