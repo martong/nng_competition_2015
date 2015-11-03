@@ -29,9 +29,31 @@ void nextIteration(const Table& table, std::size_t n, Point p, Tables& result) {
     }
 }
 
+void finish(const Table& table, Tables& result) {
+    Point min{static_cast<int>(table.width()), static_cast<int>(table.height())};
+    Point max{0, 0};
+    for (Point p : arrayRange(table)) {
+        if (table[p]) {
+            min.x = std::min(min.x, p.x);
+            min.y = std::min(min.y, p.y);
+            max.x = std::max(max.x, p.x + 1);
+            max.y = std::max(max.y, p.y + 1);
+        }
+    }
+
+    Table croppedTable{static_cast<std::size_t>(max.x - min.x),
+            static_cast<std::size_t>(max.y - min.y)};
+
+    for (Point p : PointRange{min, max}) {
+        croppedTable[p - min] = table[p];
+    }
+
+    result.push_back(croppedTable);
+}
+
 void findNextIteration(const Table& table, std::size_t n, Tables& result) {
     if (n == 0) {
-        result.push_back(table);
+        finish(table, result);
         return;
     }
 
@@ -79,5 +101,6 @@ int main(int argc, const char* argv[]) {
     std::cout << result.size() << ' ' << size << '\n';
     for (const auto& element : result) {
         std::cout << element;
+        std::cout << "----\n";
     }
 }
