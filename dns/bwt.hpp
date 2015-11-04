@@ -12,24 +12,28 @@
 namespace dns {
 //----------------------------------------------------------------------------//
 
-std::string bwt(std::string data) {
-    data.push_back('Z'); // 'EOF' element
+std::tuple<int, std::string> bwt(std::string data) {
+    //data.push_back('Z'); // 'EOF' element
     std::vector<std::string> rotations{data.size()};
     rotations[0] = data;
     //std::cout << data << std::endl;
     for (std::size_t i = 1; i < data.size(); ++i) {
         std::string s = data;
         std::rotate(s.begin(), s.end() - i, s.end());
-        //std::cout << s << std::endl;
+        std::cout << s << std::endl;
         rotations[i] = s;
     }
     std::sort(rotations.begin(), rotations.end());
     std::string output;
+    std::vector<std::string>::iterator indexIt;
     for (std::string s : rotations) {
         //std::cout << s << std::endl;
         output += *--s.end();
+        if (s == data) {
+            indexIt = std::find(rotations.begin(), rotations.end(), s);
+        }
     }
-    return output;
+    return std::make_tuple(indexIt - rotations.begin(), output);
 }
 
 std::tuple<std::size_t, std::string> bwt2(std::string data) {
@@ -88,15 +92,17 @@ std::string inverseBwt2(std::size_t index, std::string data) {
     }
 
     std::string output(data.size(), '=');
-    output[output.size() - 1] = data[index];
-    for (auto i = output.size() - 1; i > 0; --i) {
-        int m = (precedingMatchingSymbols[i] + cumulativeSums[output[i]]);
+    //output[output.size() - 1] = data[index];
+    int m = index;
+    auto s = output.size();
+    for (auto i = s-1; (i+s) >= s; --i) {
+        output[i] = data[m];
         std::cout << i << ' ' << output[i] << ' ' << output <<  ' '
                   << m << ' ' << data[m] << std::endl;
-        output[i - 1] = data[m];
+        m = (precedingMatchingSymbols[m] + cumulativeSums[output[i]]);
     }
 
-    return output.substr(0, output.size() - 1);
+    return output;
 }
 
 std::string inverseBwt(std::string data) {

@@ -7,3 +7,4 @@ include $(COMPILE_TUP)
 include $(LINK_TUP)
 
 : foreach *.o |> !linker |> %B
+

@@ -6,7 +6,8 @@
 #include <vector>
 
 int main() {
-    std::string str = "GAACTAAGGA";
+    //std::string str = "GAACTAAGGA";
+    std::string str = "this is a test.";
     //std::ifstream t("dns.txt");
     //std::string str((std::istreambuf_iterator<char>(t)),
     //        std::istreambuf_iterator<char>());
@@ -30,7 +31,7 @@ int main2() {
     std::ifstream t("dns.txt");
     std::string str((std::istreambuf_iterator<char>(t)),
             std::istreambuf_iterator<char>());
-    std::string compressed = dns::bwt(str);
+    std::string compressed;// = dns::bwt(str);
     //compress(str, std::back_inserter(compressed), dictionary);
     //auto key = townsend::algorithm::bwtEncode(compressed.begin(), compressed.end());
     std::cout << compressed.size() << ' ' << dictionary.size() << std::endl;
