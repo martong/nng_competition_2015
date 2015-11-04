@@ -63,6 +63,7 @@ Result exchSolve(std::string actual, const std::string desired) {
     Result result;
     auto exch = [&result](std::string& a, int x, int y) {
         if (x == y) return;
+        if (a[x] == a[y]) return;
         std::reverse(a.begin() + x, a.begin() + y + 1);
         result.push_back({x, y});
     };
