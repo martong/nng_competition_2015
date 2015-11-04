@@ -181,15 +181,15 @@ void finish(const Table& table, Tables& result) {
     }
 }
 
-void iterate(Table table, std::size_t n, Point p, Tables& result);
+void iterate(Table& table, std::size_t n, Point p, Tables& result);
 
-void nextIteration(const Table& table, std::size_t n, Point p, Tables& result) {
+void nextIteration(Table& table, std::size_t n, Point p, Tables& result) {
     if (!table[p]) {
         iterate(table, n, p, result);
     }
 }
 
-void findNextIteration(const Table& table, std::size_t n, Tables& result) {
+void findNextIteration(Table& table, std::size_t n, Tables& result) {
     if (n == 0) {
         finish(table, result);
         return;
@@ -213,12 +213,13 @@ void iterateDirection(Table& table, std::size_t n, Point p, Tables& result) {
     }
 }
 
-void iterate(Table table, std::size_t n, Point p, Tables& result) {
+void iterate(Table& table, std::size_t n, Point p, Tables& result) {
     table[p] = true;
     iterateDirection(table, n, p + p10, result);
     iterateDirection(table, n, p - p10, result);
     iterateDirection(table, n, p + p01, result);
     iterateDirection(table, n, p - p01, result);
+    table[p] = false;
 }
 
 int main(int argc, const char* argv[]) {
@@ -233,8 +234,8 @@ int main(int argc, const char* argv[]) {
     int middle = numberOfTiles * 2;
 
     Tables result;
-    iterate(Table{size, size, false}, numberOfTiles, Point{middle, middle},
-            result);
+    Table table{size, size, false};
+    iterate(table, numberOfTiles, Point{middle, middle}, result);
 
     std::cout << result.size() << ' ' << size << '\n';
     for (const auto& element : result) {
