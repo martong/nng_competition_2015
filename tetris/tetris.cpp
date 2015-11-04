@@ -151,6 +151,7 @@ public:
 
         Table table{size, size, false};
         result.clear();
+        holeCheckThreshold = std::min(1ul, numberOfTiles - 3);
         iterate(table, numberOfTiles, Point{middle, middle});
     }
 
@@ -174,10 +175,6 @@ private:
 
         for (Point p : PointRange{min, max}) {
             croppedTable[p - min] = table[p];
-        }
-
-        if (hasHole(croppedTable)) {
-            return;
         }
 
         if (!result.insert(std::move(croppedTable)).second) {
@@ -216,7 +213,10 @@ private:
     void iterateDirection(Table& table, std::size_t n, Point p) {
         if (!table[p]) {
             table[p] = true;
-            findNextIteration(table, n - 1);
+
+            if (n > holeCheckThreshold || !hasHole(table)) {
+                findNextIteration(table, n - 1);
+            }
             table[p] = false;
         }
     }
