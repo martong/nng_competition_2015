@@ -251,6 +251,7 @@ int main(int argc, const char* argv[]) {
     tetris.solve(numberOfTiles);
     const Tables& result = tetris.getResult();
 
+    std::cerr << "Number of results: " << result.size() << '\n';
     std::cout << result.size() << ' ' << tableSize << '\n';
     for (const auto& element : result) {
         assert(element.width() <= tableSize);
