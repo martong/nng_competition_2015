@@ -135,7 +135,6 @@ bool hasHole(Table table) {
             if (minMax.min.x != 0 && minMax.min.y != 0 &&
                 static_cast<std::size_t>(minMax.max.x) != table.width() - 1 &&
                 static_cast<std::size_t>(minMax.max.y) != table.height() - 1) {
-                //std::cerr << "-----" << minMax.min << " " << minMax.max << "\n" << table << "-----\n";
                 return true;
             }
         }
@@ -168,7 +167,6 @@ void finish(const Table& table, Tables& result) {
     }
 
     if (hasHole(croppedTable)) {
-        //std::cerr << croppedTable << "\n";
         return;
     }
 
