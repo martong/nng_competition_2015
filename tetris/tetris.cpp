@@ -135,7 +135,6 @@ bool hasHole(Table table) {
             if (minMax.min.x != 0 && minMax.min.y != 0 &&
                 static_cast<std::size_t>(minMax.max.x) != table.width() - 1 &&
                 static_cast<std::size_t>(minMax.max.y) != table.height() - 1) {
-                //std::cerr << "-----" << minMax.min << " " << minMax.max << "\n" << table << "-----\n";
                 return true;
             }
         }
@@ -144,84 +143,100 @@ bool hasHole(Table table) {
     return false;
 }
 
-static boost::posix_time::ptime start =
-        boost::posix_time::microsec_clock::universal_time();
+class Tetris {
+public:
+    void solve(std::size_t numberOfTiles) {
+        std::size_t size = numberOfTiles * 4;
+        int middle = numberOfTiles * 2;
 
-void finish(const Table& table, Tables& result) {
-    static std::size_t n = 0;
-    Point min{static_cast<int>(table.width()), static_cast<int>(table.height())};
-    Point max{0, 0};
-    for (Point p : arrayRange(table)) {
-        if (table[p]) {
-            min.x = std::min(min.x, p.x);
-            min.y = std::min(min.y, p.y);
-            max.x = std::max(max.x, p.x + 1);
-            max.y = std::max(max.y, p.y + 1);
+        Table table{size, size, false};
+        result.clear();
+        result.resize(numberOfTiles);
+        holeCheckThreshold = std::min(1ul, numberOfTiles - 3);
+        iterate(table, numberOfTiles, Point{middle, middle});
+    }
+
+    const Tables& getResult() { return result[0]; }
+private:
+    bool finish(const Table& table, std::size_t n) {
+        Point min{static_cast<int>(table.width()), static_cast<int>(table.height())};
+        Point max{0, 0};
+        for (Point p : arrayRange(table)) {
+            if (table[p]) {
+                min.x = std::min(min.x, p.x);
+                min.y = std::min(min.y, p.y);
+                max.x = std::max(max.x, p.x + 1);
+                max.y = std::max(max.y, p.y + 1);
+            }
+        }
+
+        Table croppedTable{static_cast<std::size_t>(max.x - min.x),
+                static_cast<std::size_t>(max.y - min.y)};
+
+        for (Point p : PointRange{min, max}) {
+            croppedTable[p - min] = table[p];
+        }
+
+        if (!result[n].insert(std::move(croppedTable)).second) {
+            return false;
+        }
+
+        if (n == 0 && ++iterationNumber % 1000 == 0) {
+            boost::posix_time::ptime now =
+                    boost::posix_time::microsec_clock::universal_time();
+            std::cerr << iterationNumber << '(' << now - start << ")\n";
+        }
+        return true;
+    }
+
+    void nextIteration(Table& table, std::size_t n, Point p) {
+        if (!table[p]) {
+            iterate(table, n, p);
         }
     }
 
-    Table croppedTable{static_cast<std::size_t>(max.x - min.x),
-            static_cast<std::size_t>(max.y - min.y)};
+    void findNextIteration(Table& table, std::size_t n) {
+        if (!finish(table, n) || n == 0) {
+            return;
+        }
 
-    for (Point p : PointRange{min, max}) {
-        croppedTable[p - min] = table[p];
-    }
-
-    if (hasHole(croppedTable)) {
-        //std::cerr << croppedTable << "\n";
-        return;
-    }
-
-    if (!result.insert(std::move(croppedTable)).second) {
-        return;
-    }
-
-    if (++n % 1000 == 0) {
-        boost::posix_time::ptime now =
-                boost::posix_time::microsec_clock::universal_time();
-        std::cerr << n << '(' << now - start << ")\n";
-    }
-}
-
-void iterate(Table table, std::size_t n, Point p, Tables& result);
-
-void nextIteration(const Table& table, std::size_t n, Point p, Tables& result) {
-    if (!table[p]) {
-        iterate(table, n, p, result);
-    }
-}
-
-void findNextIteration(const Table& table, std::size_t n, Tables& result) {
-    if (n == 0) {
-        finish(table, result);
-        return;
-    }
-
-    for (Point p : arrayRange(table)) {
-        if (table[p]) {
-            nextIteration(table, n, p + p10, result);
-            nextIteration(table, n, p - p10, result);
-            nextIteration(table, n, p + p01, result);
-            nextIteration(table, n, p - p01, result);
+        for (Point p : arrayRange(table)) {
+            if (table[p]) {
+                nextIteration(table, n, p + p10);
+                nextIteration(table, n, p - p10);
+                nextIteration(table, n, p + p01);
+                nextIteration(table, n, p - p01);
+            }
         }
     }
-}
 
-void iterateDirection(Table& table, std::size_t n, Point p, Tables& result) {
-    if (!table[p]) {
+    void iterateDirection(Table& table, std::size_t n, Point p) {
+        if (!table[p]) {
+            table[p] = true;
+
+            if (n > holeCheckThreshold || !hasHole(table)) {
+                findNextIteration(table, n - 1);
+            }
+            table[p] = false;
+        }
+    }
+
+    void iterate(Table& table, std::size_t n, Point p) {
         table[p] = true;
-        findNextIteration(table, n - 1, result);
+        iterateDirection(table, n, p + p10);
+        iterateDirection(table, n, p - p10);
+        iterateDirection(table, n, p + p01);
+        iterateDirection(table, n, p - p01);
         table[p] = false;
     }
-}
 
-void iterate(Table table, std::size_t n, Point p, Tables& result) {
-    table[p] = true;
-    iterateDirection(table, n, p + p10, result);
-    iterateDirection(table, n, p - p10, result);
-    iterateDirection(table, n, p + p01, result);
-    iterateDirection(table, n, p - p01, result);
-}
+    std::vector<Tables> result;
+    std::size_t holeCheckThreshold = 1;
+    std::size_t iterationNumber = 0;
+    boost::posix_time::ptime start =
+            boost::posix_time::microsec_clock::universal_time();
+};
+
 
 int main(int argc, const char* argv[]) {
     if (argc != 2) {
@@ -230,21 +245,20 @@ int main(int argc, const char* argv[]) {
     }
 
     std::size_t numberOfTiles = boost::lexical_cast<std::size_t>(argv[1]);
+    std::size_t tableSize = numberOfTiles * 2;
 
-    std::size_t size = numberOfTiles * 4;
-    int middle = numberOfTiles * 2;
+    Tetris tetris;
+    tetris.solve(numberOfTiles);
+    const Tables& result = tetris.getResult();
 
-    Tables result;
-    iterate(Table{size, size, false}, numberOfTiles, Point{middle, middle},
-            result);
-
-    std::cout << result.size() << ' ' << size << '\n';
+    std::cerr << "Number of results: " << result.size() << '\n';
+    std::cout << result.size() << ' ' << tableSize << '\n';
     for (const auto& element : result) {
-        assert(element.width() <= static_cast<std::size_t>(middle));
-        assert(element.height() <= static_cast<std::size_t>(middle));
+        assert(element.width() <= tableSize);
+        assert(element.height() <= tableSize);
         Point p;
-        for (p.y = 0; p.y < middle; ++p.y) {
-            for (p.x = 0; p.x < middle; ++p.x) {
+        for (p.y = 0; p.y < static_cast<int>(tableSize); ++p.y) {
+            for (p.x = 0; p.x < static_cast<int>(tableSize); ++p.x) {
                 std::cout << (arrayAt(element, p, false) ? 'X' : ' ');
             }
             std::cout << '\n';
