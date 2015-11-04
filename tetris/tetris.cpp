@@ -1,21 +1,58 @@
 #include "Array.hpp"
 #include "Point.hpp"
 #include "PointRange.hpp"
+#include "Hash.hpp"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <iostream>
 #include <vector>
+#include <unordered_set>
 
 using Table = Array<bool>;
-using Tables = std::vector<Table>;
 
-void iterate(Table table, std::size_t n, Point p, Tables& result);
+struct MinMax {
+    Point min;
+    Point max;
+};
 
-void nextIteration(const Table& table, std::size_t n, Point p, Tables& result) {
-    if (!table[p]) {
-        iterate(table, n, p, result);
+MinMax floodFill(Table& table, Point p0) {
+    std::vector<Point> pointsToVisit;
+    pointsToVisit.reserve(table.width() * table.height());
+    pointsToVisit.push_back(p0);
+
+    MinMax result{Point{static_cast<int>(table.width() - 1),
+            static_cast<int>(table.height() - 1)}, Point{0, 0}};
+    while (!pointsToVisit.empty()) {
+        Point p = pointsToVisit.back();
+        pointsToVisit.pop_back();
+
+        if (!arrayAt(table, p, true)) {
+            result.min.x = std::min(result.min.x, p.x);
+            result.min.y = std::min(result.min.y, p.y);
+            result.max.x = std::max(result.max.x, p.x);
+            result.max.y = std::max(result.max.y, p.y);
+            table[p] = true;
+            pointsToVisit.push_back(p + p10);
+            pointsToVisit.push_back(p - p10);
+            pointsToVisit.push_back(p + p01);
+            pointsToVisit.push_back(p - p01);
+        }
     }
+
+    return result;
+}
+
+std::ostream& operator<<(std::ostream& os, const Table& array) {
+    Point p;
+    for (p.y = 0; p.y < static_cast<int>(array.height()); ++p.y) {
+        for (p.x = 0; p.x < static_cast<int>(array.width()); ++p.x) {
+            os << (array[p] ? 'X' : ' ');
+        }
+        os << '\n';
+    }
+    return os;
 }
 
 enum class Direction {
@@ -28,7 +65,7 @@ struct CompareData {
     Point stepY;
 };
 
-CompareData compareDatas[] = {
+const CompareData compareDatas[] = {
     {Point{0, 0}, Point{1, 0}, Point{0, 1}}, // normal
     {Point{0, 1}, Point{0, -1}, Point{1, 0}}, // left
     {Point{1, 0}, Point{0, 1}, Point{-1, 0}}, // right
@@ -75,7 +112,43 @@ bool operator==(const Table& lhs, const Table& rhs) {
     return false;
 }
 
+namespace std {
+
+template<>
+struct hash<Table> {
+    std::size_t operator()(const Table& table) const {
+        size_t seed = 0;
+        hash_combine(seed, table.width() * table.height());
+        hash_combine(seed, std::count(table.begin(), table.end(), true));
+        return seed;
+    }
+};
+
+}
+
+using Tables = std::unordered_set<Table>;
+
+bool hasHole(Table table) {
+    for (Point p : arrayRange(table)) {
+        if (!table[p]) {
+            MinMax minMax = floodFill(table, p);
+            if (minMax.min.x != 0 && minMax.min.y != 0 &&
+                static_cast<std::size_t>(minMax.max.x) != table.width() - 1 &&
+                static_cast<std::size_t>(minMax.max.y) != table.height() - 1) {
+                //std::cerr << "-----" << minMax.min << " " << minMax.max << "\n" << table << "-----\n";
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+static boost::posix_time::ptime start =
+        boost::posix_time::microsec_clock::universal_time();
+
 void finish(const Table& table, Tables& result) {
+    static std::size_t n = 0;
     Point min{static_cast<int>(table.width()), static_cast<int>(table.height())};
     Point max{0, 0};
     for (Point p : arrayRange(table)) {
@@ -94,13 +167,28 @@ void finish(const Table& table, Tables& result) {
         croppedTable[p - min] = table[p];
     }
 
-    for (const Table& otherTable : result) {
-        if (croppedTable == otherTable) {
-            return;
-        }
+    if (hasHole(croppedTable)) {
+        //std::cerr << croppedTable << "\n";
+        return;
     }
 
-    result.push_back(croppedTable);
+    if (!result.insert(std::move(croppedTable)).second) {
+        return;
+    }
+
+    if (++n % 1000 == 0) {
+        boost::posix_time::ptime now =
+                boost::posix_time::microsec_clock::universal_time();
+        std::cerr << n << '(' << now - start << ")\n";
+    }
+}
+
+void iterate(Table table, std::size_t n, Point p, Tables& result);
+
+void nextIteration(const Table& table, std::size_t n, Point p, Tables& result) {
+    if (!table[p]) {
+        iterate(table, n, p, result);
+    }
 }
 
 void findNextIteration(const Table& table, std::size_t n, Tables& result) {
