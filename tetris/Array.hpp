@@ -30,6 +30,8 @@ public:
     typedef typename Data::const_reference const_reference;
     typedef typename Data::iterator iterator;
     typedef typename Data::const_iterator const_iterator;
+    typedef typename Data::reverse_iterator reverse_iterator;
+    typedef typename Data::const_iterator reverse_const_iterator;
 
     Array(): width_(0), height_(0) {}
     Array(std::size_t width, std::size_t height, const T& defValue = T()):
@@ -82,6 +84,10 @@ public:
     const_iterator end() const { return data_.end(); }
     const_iterator cbegin() const { return data_.cbegin(); }
     const_iterator cend() const { return data_.cend(); }
+    reverse_iterator rbegin() { return data_.rbegin(); }
+    reverse_iterator rend() { return data_.rend(); }
+    reverse_const_iterator rbegin() const { return data_.rbegin(); }
+    reverse_const_iterator rend() const { return data_.rend(); }
 };
 
 template<typename T>

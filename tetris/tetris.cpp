@@ -119,7 +119,46 @@ struct hash<Table> {
     std::size_t operator()(const Table& table) const {
         size_t seed = 0;
         hash_combine(seed, table.width() * table.height());
+
+        std::size_t internalSeed;
+        if (table.width() == table.height()) {
+            internalSeed = getStraightHash(table) + getRotatedHash(table);
+        } else if (table.width() > table.height()) {
+           internalSeed = getStraightHash(table);
+        } else {
+           internalSeed = getRotatedHash(table);
+        }
+        hash_combine(seed, internalSeed);
+
         return seed;
+    }
+private:
+    template <typename T>
+    static std::size_t getHash(const T& v) {
+        std::size_t forward = 0;
+        std::size_t backward = 0;
+        for (std::size_t i = 0; i < v.size(); ++i) {
+            hash_combine(forward, v[i]);
+            hash_combine(backward, v[v.size() - 1 - i]);
+        }
+
+        return forward + backward;
+    }
+
+    static std::size_t getStraightHash(const Table& table) {
+        return getHash(table);
+    }
+
+    static std::size_t getRotatedHash(const Table& table) {
+        Point p;
+        std::vector<bool> values;
+        values.reserve(table.width() * table.height());
+        for (p.x = 0; p.x < static_cast<int>(table.width()); ++p.x) {
+        for (p.y = static_cast<int>(table.height() - 1); p.y >= 0; --p.y) {
+                values.push_back(table[p]);
+            }
+        }
+        return getHash(values);
     }
 };
 
