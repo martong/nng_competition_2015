@@ -252,11 +252,11 @@ int main() {
                 // We can use strlen, and check against 0 is faster than
                 // check against '\n'
                 array[index] = '\0';
-                //++index;
                 ++index;
                 strlen = index++;
-                //index += 2; // leaving space for strlen
-                vector[string_index] = &array[index];
+                if (string_index < num) {
+                    vector[string_index] = &array[index];
+                }
             } else {
                 ++index;
                 ++array[strlen];
