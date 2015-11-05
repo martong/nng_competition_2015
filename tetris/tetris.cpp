@@ -119,7 +119,6 @@ struct hash<Table> {
     std::size_t operator()(const Table& table) const {
         size_t seed = 0;
         hash_combine(seed, table.width() * table.height());
-        hash_combine(seed, std::count(table.begin(), table.end(), true));
         return seed;
     }
 };
