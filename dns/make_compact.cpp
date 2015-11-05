@@ -29,7 +29,7 @@ int main() {
         dictionary[std::string(1, i)] = i;
     }
 
-    std::vector<int> compressed;
-    compress(compactStr, std::back_inserter(compressed), dictionary);
-    std::cout << compressed.size() << ' ' << dictionary.size() << std::endl;
+    //std::vector<int> compressed;
+    //compress(compactStr, std::back_inserter(compressed), dictionary);
+    //std::cout << compressed.size() << ' ' << dictionary.size() << std::endl;
 }

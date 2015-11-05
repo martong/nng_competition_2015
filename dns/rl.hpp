@@ -1,7 +1,9 @@
 #ifndef DNS_RL_HPP
 #define DNS_RL_HPP
 
+#include <cassert>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <string>
 #include <sstream>
@@ -28,6 +30,14 @@ std::string rlEncode(int numberOfSymbols, std::string input) {
                 output << static_cast<char>(rl + increment);
                 found += increment;
                 //std::cout << found << ' ' << nextFound << std::endl;
+            }
+        } else if (256 == numberOfSymbols) {
+            while ((nextFound - found) > 0) {
+                unsigned char increment = ((nextFound - found) > 255) ? 255
+                    : nextFound - found;
+                output << input[found];
+                output << increment;
+                found += increment;
             }
         } else {
             throw 0; // lol

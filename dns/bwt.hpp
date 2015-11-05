@@ -2,7 +2,7 @@
 #define DNS_BWT_HPP
 
 #include <algorithm>
-#include <iostream>
+//#include <iostream>
 #include <iterator>
 #include <map>
 #include <string>
@@ -20,7 +20,7 @@ std::tuple<int, std::string> bwt(std::string data) {
     for (std::size_t i = 1; i < data.size(); ++i) {
         std::string s = data;
         std::rotate(s.begin(), s.end() - i, s.end());
-        std::cout << s << std::endl;
+        // std::cout << s << std::endl;
         rotations[i] = s;
     }
     std::sort(rotations.begin(), rotations.end());
@@ -43,8 +43,8 @@ std::tuple<std::size_t, std::string> bwt2(std::string data) {
     std::string::iterator it = data.end();
     rotations[0] = data.begin();
     for (std::size_t i = 1; i < data.size(); ++i) {
-        std::cout << (std::string(it, data.end()) +
-                std::string(data.begin(), it)) << std::endl;
+        // std::cout << (std::string(it, data.end()) +
+        //         std::string(data.begin(), it)) << std::endl;
         rotations[i] = --it;
     }
     std::sort(rotations.begin(), rotations.end(),
@@ -58,7 +58,7 @@ std::tuple<std::size_t, std::string> bwt2(std::string data) {
                         //          << (lhsString < rhsString) << std::endl;
                 return lhsString < rhsString;
             });
-    std::cout << "after sort..." << std::endl;
+    // std::cout << "after sort..." << std::endl;
     std::string output;
     std::vector<std::string::iterator>::iterator indexIt =
         rotations.begin();
@@ -66,10 +66,10 @@ std::tuple<std::size_t, std::string> bwt2(std::string data) {
         if ((std::string{i, data.end()} + std::string{data.begin(), i})
                 == data) {
             indexIt = std::find(rotations.begin(), rotations.end(), i);
-            std::cout << "found " << (indexIt - rotations.begin()) << std::endl;
+            // std::cout << "found " << (indexIt - rotations.begin()) << std::endl;
         }
-        std::cout << (std::string{i, data.end()} +
-                std::string{data.begin(), i}) << std::endl;
+        // std::cout << (std::string{i, data.end()} +
+        //         std::string{data.begin(), i}) << std::endl;
         output += (data.begin() == i) ? *--data.end() : *--i;
     }
     return std::make_tuple(indexIt - rotations.begin(), output);
@@ -97,8 +97,8 @@ std::string inverseBwt2(std::size_t index, std::string data) {
     auto s = output.size();
     for (auto i = s-1; (i+s) >= s; --i) {
         output[i] = data[m];
-        std::cout << i << ' ' << output[i] << ' ' << output <<  ' '
-                  << m << ' ' << data[m] << std::endl;
+        // std::cout << i << ' ' << output[i] << ' ' << output <<  ' '
+        //           << m << ' ' << data[m] << std::endl;
         m = (precedingMatchingSymbols[m] + cumulativeSums[output[i]]);
     }
 
@@ -108,8 +108,8 @@ std::string inverseBwt2(std::size_t index, std::string data) {
 std::string inverseBwt(std::string data) {
     std::vector<std::string> rotations{data.size()};
     for (std::size_t i = 0; i < data.size(); ++i) {
-        std::cout << i << ", ";
-        std::cout.flush();
+        // std::cout << i << ", ";
+        // std::cout.flush();
         std::string::const_iterator it = data.begin();
 
         //std::cout << "inserting..." << std::endl;
