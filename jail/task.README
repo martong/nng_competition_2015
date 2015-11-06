@@ -1,0 +1,40 @@
+Mr. Guru! 
+
+A feladata az, hogy megtervezze fegyházunk étkeztetésének beosztását oly módon, hogy ott a rabok ne verekedjenek össze. A fogvatartottak az idejük nagy részét elszeparált cellákban töltik, csak ebédidőben találkoznak. Az általam bevezetett szigorú fegyelemnek köszönhetően két fogoly egymással soha nem verekszik össze. Amit viszont még nem tudtunk kiküszöbölni, hogy ketten összefogva egy harmadikat összeverjenek. Hogy az ilyen összefogásokat figyelemmel tudjuk követni, minden fogolynak adtunk egy számot, amit agressziós indexnek nevezünk. Egy bonyolult rendszernek köszönhetően sikerült a számokat úgy kiosztani, hogy segítségükkel 100%-os biztonsággal megjósolhatóak a verekedések. 
+
+Ugyanis ha van három fogvatartottunk, akiknek agressziós indexe rendre: a, b, c. Akkor és csak akkor fognak összeverekedni, ha igaz, hogy 
+
+a+b=c 
+
+Ezért különösen fontos lenne a rabokat olyan turnusokba beosztani az ebédlőben, hogy verekedés ne fordulhasson elő. Átküldöm önnek az összes fogvatartott agressziós indexét, kérem alakítsa ki a lehető legkevesebb turnust, amiben garantáltan nincs verekedés. Az ebédlő mérete gyakorlatilag korlátlan, ha kell az összes fogvatartottat egyszerre is le tudjuk vinni. 
+
+Az általam küldött fájl formátuma:
+
+<fogvatartottak száma> 
+<1. fogvatartott agressziós indexe> 
+<2. fogvatartott agressziós indexe> 
+... 
+<n. fogvatartott agressziós indexe> 
+
+Ahol, 
+
+<fogvatartottak száma> := Egy egész szám, ami megadja, hogy hány agressziós index következik 
+<x. fogvatartott agressziós indexe> := Egy egész szám 1 és 1000000 között.
+
+Az általam elvárt válasz formátuma pedig a következő:
+
+<turnusok száma> 
+<1. turnus 1. agressziós index> <1. turnus 2. agressziós index> ... <1. turnus i. agressziós index>
+<2. turnus 1. agressziós index> ... <2. turnus j. agressziós index> ... <n. turnus 1. agressziós index> 
+... 
+<z. turnus k. agressziós index> 
+
+Ahol 
+
+<turnusok száma> := megadja, hogy összesen hány turnus következik
+<x. turnus 1. agressziós index> ... <x. turnus n. agressziós index> := Az adott turnusra beosztott agressziós indexek szóközzel elválasztva. 
+
+Három különböző objektumban tartunk fogvatartottakat. Kérem, mindhárom beosztást készítse el.
+
+Tisztelettel,
+Szigorú Szilárd ezredes 
