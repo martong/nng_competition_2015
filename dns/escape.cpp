@@ -27,7 +27,7 @@ int main() {
             std::cout << '\\' << it->second;
             wasNumSequence = false;
         } else {
-            if (c < 0x20) {
+            if (c < 0x10) {
                 std::cout << "\\" << std::oct << (int)c;
                 wasNumSequence = true;
             } else if (wasNumSequence && c >= '0' && c <= '9') {
