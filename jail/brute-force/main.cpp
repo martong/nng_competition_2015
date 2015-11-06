@@ -1,6 +1,8 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <random>
+#include <limits>
 
 using Group = std::vector<int>;
 using Groups = std::vector<Group>;
@@ -63,6 +65,18 @@ int main(int argc, char** argv) {
         }
     } else
         std::cerr << "Unable to open file";
-    auto r = solve(indexes);
-    std::cout << r;
+
+    std::random_device rd;
+    std::mt19937 g(rd());
+
+    auto min_size = std::numeric_limits<std::size_t>::max();
+    while (true) {
+        std::shuffle(indexes.begin(), indexes.end(), g);
+        auto r = solve(indexes);
+        if (r.size() < min_size) {
+            std::cout << r;
+            std::cout << "---------------------------------------" << std::endl;
+            min_size = r.size();
+        }
+    }
 }
