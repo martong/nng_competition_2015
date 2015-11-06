@@ -1,56 +1,48 @@
 #include <iostream>
 #include <iomanip>
+#include <map>
 
 int main() {
     std::cout << R"(#include <iostream>
 int main() {
-    std::cout << ")";
+    unsigned char c[] = ")";
     unsigned char c;
-    bool wasNull = false;
+    bool wasNumSequence = false;
+    std::size_t n = 0;
+    std::map<unsigned char, char> escapeSequences = {
+        {'\a', 'a'},
+        {'\b', 'b'},
+        {'\f', 'f'},
+        {'\n', 'n'},
+        {'\t', 't'},
+        {'\v', 'v'},
+        {'\a', 'a'},
+        {'\\', '\\'},
+        {'"', '"'},
+    };
     while (std::cin.get(reinterpret_cast<char&>(c)).good()) {
-        switch (c) {
-        case '\0':
-            std::cout << "\\0";
-            break;
-        case '\a':
-            std::cout << "\\a";
-            break;
-        case '\b':
-            std::cout << "\\b";
-            break;
-        case '\f':
-            std::cout << "\\f";
-            break;
-        case '\n':
-            std::cout << "\\n";
-            break;
-        case '\r':
-            std::cout << "\\r";
-            break;
-        case '\t':
-            std::cout << "\\t";
-            break;
-        case '\v':
-            std::cout << "\\v";
-            break;
-        case '\\':
-            std::cout << "\\\\";
-            break;
-        case '"':
-            std::cout << "\\\"";
-            break;
-        default:
-            if (c < 0x20 || (c >= 0x7f && c < 0xa0)) {
-                std::cout << "\\" << std::oct << std::setw(3) <<
-                        std::setfill('0') << (int)c;
-            } else if (wasNull && c >= '0' && c <= '9') {
-                std::cout << "00" << c;
+        ++n;
+        auto it = escapeSequences.find(c);
+        if (it != escapeSequences.end()) {
+            std::cout << '\\' << it->second;
+            wasNumSequence = false;
+        } else {
+            if (c < 0x20) {
+                std::cout << "\\" << std::oct << (int)c;
+                wasNumSequence = true;
+            } else if (wasNumSequence && c >= '0' && c <= '9') {
+                std::cout << "\"\"" << c;
+                wasNumSequence = false;
             } else {
                 std::cout << c;
+                wasNumSequence = false;
             }
         }
-        wasNull = c == '\0';
     }
-    std::cout << "\";\n}\n";
+    std::cout << std::dec << R"(";
+    for (std::size_t i = 0; i < )" << n << R"(; ++i) {
+        std::cout << c[i];
+    }
+})";
     return 0;
 }
