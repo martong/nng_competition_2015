@@ -9,34 +9,29 @@ int main() {
     unsigned char c;
     bool wasNumSequence = false;
     std::size_t n = 0;
-    std::map<unsigned char, const char*> escapeSequences = {
-        {'\a', "\a"},
-        {'\b', "\b"},
-        {'\f', "\f"},
-        {'\t', "\t"},
-        {'\v', "\v"},
-        {'\n', "\\n"},
-        {'\r', "\\r"},
-        {'\\', "\\\\"},
-        {'"', "\\\""},
+    std::map<unsigned char, std::pair<const char*, bool>> escapeSequences = {
+        {'\a', {"\a", false}},
+        {'\b', {"\b", false}},
+        {'\f', {"\f", false}},
+        {'\v', {"\v", false}},
+        {'\n', {"\\n", false}},
+        {'\r', {"\\r", false}},
+        {'"', {"\\\"", false}},
+        {'\\', {"\\\\", false}},
+        {'\0', {"\\0", true}},
     };
     while (std::cin.get(reinterpret_cast<char&>(c)).good()) {
         ++n;
         auto it = escapeSequences.find(c);
         if (it != escapeSequences.end()) {
-            std::cout << it->second;
+            std::cout << it->second.first;
+            wasNumSequence = it->second.second;
+        } else if (wasNumSequence && c >= '0' && c <= '9') {
+            std::cout << "\"\"" << c;
             wasNumSequence = false;
         } else {
-            if (c < 0x10) {
-                std::cout << "\\" << std::oct << (int)c;
-                wasNumSequence = true;
-            } else if (wasNumSequence && c >= '0' && c <= '9') {
-                std::cout << "\"\"" << c;
-                wasNumSequence = false;
-            } else {
-                std::cout << c;
-                wasNumSequence = false;
-            }
+            std::cout << c;
+            wasNumSequence = false;
         }
     }
     std::cout << std::dec << R"(";
