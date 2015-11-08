@@ -3,6 +3,7 @@
 #include <fstream>
 #include <random>
 #include <limits>
+#include <algorithm>
 
 using Group = std::vector<int>;
 using Groups = std::vector<Group>;
