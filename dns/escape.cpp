@@ -9,22 +9,21 @@ int main() {
     unsigned char c;
     bool wasNumSequence = false;
     std::size_t n = 0;
-    std::map<unsigned char, char> escapeSequences = {
-        {'\a', 'a'},
-        {'\b', 'b'},
-        {'\f', 'f'},
-        {'\n', 'n'},
-        {'\t', 't'},
-        {'\v', 'v'},
-        {'\a', 'a'},
-        {'\\', '\\'},
-        {'"', '"'},
+    std::map<unsigned char, const char*> escapeSequences = {
+        {'\a', "\a"},
+        {'\b', "\b"},
+        {'\f', "\f"},
+        {'\n', "\\n"},
+        {'\t', "\t"},
+        {'\v', "\v"},
+        {'\\', "\\\\"},
+        {'"', "\\\""},
     };
     while (std::cin.get(reinterpret_cast<char&>(c)).good()) {
         ++n;
         auto it = escapeSequences.find(c);
         if (it != escapeSequences.end()) {
-            std::cout << '\\' << it->second;
+            std::cout << it->second;
             wasNumSequence = false;
         } else {
             if (c < 0x10) {
