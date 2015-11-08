@@ -18,7 +18,7 @@ int main() {
         {'\r', {"\\r", false}},
         {'"', {"\\\"", false}},
         {'\\', {"\\\\", false}},
-        {'\0', {"\\0", true}},
+        //{'\0', {"\\0", true}},
     };
     while (std::cin.get(reinterpret_cast<char&>(c)).good()) {
         ++n;
