@@ -13,6 +13,7 @@ int main() {
         {'\a', {"\a", false}},
         {'\b', {"\b", false}},
         {'\f', {"\f", false}},
+        {'\t', {"\t", false}},
         {'\v', {"\v", false}},
         {'\n', {"\\n", false}},
         {'\r', {"\\r", false}},
