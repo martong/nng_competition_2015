@@ -51,10 +51,11 @@ Result solve(char* actual, const char* desired, int size, int offset) {
         ++desired;
         ++skipped;
     }
+    if (skipped >= size) { return {}; }
 
     int max_value = 0;
     Reversal max_reversal{0, 0}; // Arbitrary
-    const int N = size;
+    const int N = size - skipped;
     for (int m = N; m > 0; --m) {
         std::string candidate(actual, actual + m);
         std::reverse(candidate.begin(), candidate.end());
