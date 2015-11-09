@@ -15,6 +15,7 @@
 #include <chrono>
 #include <iterator>
 #include <cstring>
+#include <cstdlib>
 #include <string.h>
 
 #define ASSERT(CONDITION)                                                      \
@@ -238,8 +239,8 @@ int main() {
     vector[0] = &array[1];
     std::size_t strlen = 0;
 
-    const int BufSize = 4*1024*1024;
-    std::vector<char> rBuffer(BufSize);
+    constexpr int BufSize = 512*1024;
+    std::array<char, BufSize> rBuffer;
     int bytesInBuffer = std::fread(&rBuffer[0], sizeof rBuffer[0],
             rBuffer.size(), stdin);
     while(bytesInBuffer != 0) {
@@ -277,15 +278,15 @@ int main() {
     auto sort_end = Clock::now().time_since_epoch().count();
     std::cerr << "Sort took: " << (sort_end - sort_start) / double(Den) * Num << std::endl;
 
-    const int wBufSize = 4*1024*1024;
-    std::vector<char> wBuffer(wBufSize);
+    constexpr int wBufSize = 512*1024;
+    std::array<char, wBufSize> wBuffer;
     int wroteToBuffer = 0;
     for (const char* s: vector) {
         std::memcpy(&wBuffer[wroteToBuffer], s, s[-1]);
         wroteToBuffer += s[-1];
         wBuffer[wroteToBuffer++] = '\n';
         // TODO branch prediction hint (?)
-        if (wBufSize - wroteToBuffer - 64 < 0) {
+        if (wBufSize - wroteToBuffer - 64 <= 0) {
             std::fwrite(&wBuffer[0], sizeof wBuffer[0], wroteToBuffer, stdout);
             wroteToBuffer = 0;
         }
