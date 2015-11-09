@@ -281,9 +281,8 @@ int main() {
     std::vector<char> wBuffer(wBufSize);
     int wroteToBuffer = 0;
     for (const char* s: vector) {
-        int i = 0;
-        while(s[i] != '\0')
-            wBuffer[wroteToBuffer++] = s[i++];
+        std::memcpy(&wBuffer[wroteToBuffer], s, s[-1]);
+        wroteToBuffer += s[-1];
         wBuffer[wroteToBuffer++] = '\n';
         // TODO branch prediction hint (?)
         if (wBufSize - wroteToBuffer - 64 < 0) {
