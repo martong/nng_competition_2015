@@ -44,27 +44,14 @@ int alphaToIndex(char c) {
     return c - 'a';
 }
 
-//int fstrlen(const char* s) { return strlen(s); }
-
 int fstrlen(const char* s) {
-    //int len = *(--s);
-    //std::cerr << "len: " << len << " ";
-    //return len;
     return *(--s);
 }
-
-//int fstrlen(const char* s) {
-    //for (int i = 0; i < 65; ++i) {
-        //if (s[i] == '\n') return i;
-    //}
-    //assert(true);
-    //return 0;
-//}
 
 // return dth character of s, -1 if d = length of string
 int charAt(const char* s, int d) {
     const int len = fstrlen(s);
-    assert(d >= 0 && d <= len);
+    //assert(d >= 0 && d <= len);
     if (d == len) return -1;
     return alphaToIndex(s[d]);
 }
@@ -159,58 +146,6 @@ std::ostream& operator<<(std::ostream& os, const Strings& ss) {
         os << s << "\n";
     }
     return os;
-}
-
-
-void test1() {
-    Strings s{"zzz", "fee", "eee", "ee", "aaaa"};
-    Strings s2(s);
-    std::sort(s.begin(), s.end(), [](const char* lhs, const char* rhs) {
-                return strcmp(lhs, rhs) < 0;
-            });
-    sort(s2);
-    std::cout << s;
-    std::cout << "----\n";
-    std::cout << s2;
-    ASSERT(s == s2);
-}
-
-void test2() {
-    Strings s{
-       "gzhwclin",
-       "glerwlm",
-       "jiwhnswg",
-       "lwwrfs",
-       "lcmgfdc",
-       "srxrch",
-       "auxlmc",
-       "jqqw",
-       "ogrm",
-       "otqsv",
-       "froidbtcj",
-       "vnip",
-       "ecmxtxawrv",
-       "eqvkbyyhas",
-       "ijfdgemu",
-       "autmofg",
-       "hkvuiieku",
-       "enhhdxu",
-       "lojd",
-       "gbhsnqpz"};
-    Strings s2(s);
-    std::sort(s.begin(), s.end(), [](const char* lhs, const char* rhs) {
-                return strcmp(lhs, rhs) < 0;
-            });
-    std::cout << s;
-    sort(s2);
-    std::cout << s2;
-    ASSERT(s == s2);
-}
-
-int test() {
-    test1();
-    test2();
-    return 0;
 }
 
 int main() {
