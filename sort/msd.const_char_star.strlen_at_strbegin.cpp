@@ -243,27 +243,26 @@ int main() {
     std::array<char, BufSize> rBuffer;
     int bytesInBuffer = std::fread(&rBuffer[0], sizeof rBuffer[0],
             rBuffer.size(), stdin);
+    int remainingLength = 0;
     while(bytesInBuffer != 0) {
-        int readFromBuffer = 0;
-        while (readFromBuffer < bytesInBuffer) {
-            array[index] = rBuffer[readFromBuffer];
-            if (array[index] == '\n') {
-
-                ++string_index;
-                // We can use strlen, and check against 0 is faster than
-                // check against '\n'
-                array[index] = '\0';
-                ++index;
+        int bufferIndex = 0;
+        while (bufferIndex < bytesInBuffer) {
+            int i = 0;
+            while (rBuffer[bufferIndex + i] != '\n' && bufferIndex + i < bytesInBuffer) ++i;
+            std::memcpy(&array[index], &rBuffer[bufferIndex], i);
+            index += i;
+            bufferIndex += i;
+            if (rBuffer[bufferIndex++] == '\n') {
+                array[strlen] = i + remainingLength;
+                array[index++] = '\0';
+                vector[string_index++] = &array[strlen + 1];
                 strlen = index++;
-                if (string_index < num) {
-                    vector[string_index] = &array[index];
-                }
+                remainingLength = 0;
             } else {
-                ++index;
-                ++array[strlen];
+                remainingLength = i;
             }
-            ++readFromBuffer;
         }
+
         bytesInBuffer = std::fread(&rBuffer[0], sizeof rBuffer[0],
                 rBuffer.size(), stdin);
     }
