@@ -38,7 +38,73 @@ int equalAtFront(const char* a, const char* b, int size) {
     return match;
 }
 
-Result solve(char* actual, const char* desired, int size, int offset) {
+// Number of equal elements at back.
+int equalAtBack(const char* a, const char* b, int size) {
+    int i = size - 1;
+    int match = 0;
+    while (a[i] == b[i] && i >= 0) {
+        --i;
+        ++match;
+    }
+    return match;
+}
+
+// int equalAtBack2(const char* a, const char* b, int size) {
+// int i = 0;
+// int match = 0;
+// while (a[size - 1 - i] == b[size - 1 - i] && i >= 0) {
+//--i;
+//++match;
+//}
+// return match;
+//}
+
+Result solveDown(char* actual, const char* desired, int size, int offset) {
+    if (size <= 1) {
+        return {};
+    }
+
+    Result result;
+
+    int skipped = 0;
+    while (*actual == *desired) {
+        --actual;
+        --desired;
+        ++skipped;
+    }
+    if (skipped >= size) {
+        return {};
+    }
+
+    int max_value = 0;
+    int max_reversal = 0;
+    const int N = size - skipped - 1;
+    for (int m = N; m > 0; --m) {
+        std::string candidate(actual - m, actual + 1);
+        std::reverse(candidate.begin(), candidate.end());
+        auto value =
+            equalAtBack(&candidate.front(), &desired[-m], candidate.size());
+        if (value > max_value) {
+            max_reversal = m;
+            max_value = value;
+        }
+    }
+    assert(max_value != 0);
+
+    std::reverse(&actual[-max_reversal], &actual[1]);
+    result.push_back({offset - skipped - max_reversal,
+                      offset - skipped/*closed interval*/});
+
+    auto rest = solveDown(&actual[-max_value], &desired[-max_value],
+                          N - max_value + 1, offset - skipped - max_value);
+    for (const auto& r : rest) {
+        result.push_back(r);
+    }
+
+    return result;
+}
+
+Result solveUp(char* actual, const char* desired, int size, int offset) {
     if (size <= 1) {
         return {};
     }
@@ -51,7 +117,9 @@ Result solve(char* actual, const char* desired, int size, int offset) {
         ++desired;
         ++skipped;
     }
-    if (skipped >= size) { return {}; }
+    if (skipped >= size) {
+        return {};
+    }
 
     int max_value = 0;
     Reversal max_reversal{0, 0}; // Arbitrary
@@ -61,7 +129,7 @@ Result solve(char* actual, const char* desired, int size, int offset) {
         std::reverse(candidate.begin(), candidate.end());
         auto value = equalAtFront(&candidate[0], &desired[0], candidate.size());
         if (value > max_value) {
-            max_reversal = {0, m}; // closed intervall needed
+            max_reversal = {0, m};
             max_value = value;
         }
     }
@@ -73,8 +141,8 @@ Result solve(char* actual, const char* desired, int size, int offset) {
         {offset + skipped + std::get<0>(max_reversal),
          offset + skipped + std::get<1>(max_reversal) - 1 /*closed interval*/});
 
-    auto rest = solve(&actual[max_value], &desired[max_value], N - max_value,
-                      offset + skipped + max_value);
+    auto rest = solveUp(&actual[max_value], &desired[max_value], N - max_value,
+                        offset + skipped + max_value);
     for (const auto& r : rest) {
         result.push_back(r);
     }
@@ -83,15 +151,24 @@ Result solve(char* actual, const char* desired, int size, int offset) {
 }
 
 Result solve(std::string actual, const std::string desired) {
-    return solve(const_cast<char*>(actual.data()), desired.data(),
-                 actual.size(), 0);
+    // return solveUp(const_cast<char*>(actual.data()), desired.data(),
+    // actual.size(), 0);
+    assert(actual.size() == desired.size());
+    auto size = actual.size();
+    return solveDown(const_cast<char*>(actual.data() + size - 1),
+                     desired.data() + size - 1, size, size - 1);
 }
 
 void test1() {
     ASSERT(equalAtFront("aab", "aac", 3) == 2);
     ASSERT(equalAtFront("", "", 0) == 0);
-    ASSERT(equalAtFront("a", "b", 0) == 0);
+    ASSERT(equalAtFront("a", "b", 1) == 0);
     ASSERT(equalAtFront("a", "a", 1) == 1);
+
+    ASSERT(equalAtBack("baa", "caa", 3) == 2);
+    ASSERT(equalAtBack("", "", 0) == 0);
+    ASSERT(equalAtBack("a", "b", 1) == 0);
+    ASSERT(equalAtBack("a", "a", 1) == 1);
 }
 
 int t() {
