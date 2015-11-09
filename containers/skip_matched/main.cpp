@@ -59,6 +59,8 @@ int equalAtBack(const char* a, const char* b, int size) {
 // return match;
 //}
 
+struct Bad {};
+
 Result solveDown(char* actual, const char* desired, int size, int offset) {
     if (size <= 1) {
         return {};
@@ -89,11 +91,13 @@ Result solveDown(char* actual, const char* desired, int size, int offset) {
             max_value = value;
         }
     }
-    assert(max_value != 0);
+    if (max_value == 0) {
+        throw Bad{};
+    }
 
     std::reverse(&actual[-max_reversal], &actual[1]);
     result.push_back({offset - skipped - max_reversal,
-                      offset - skipped/*closed interval*/});
+                      offset - skipped /*closed interval*/});
 
     auto rest = solveDown(&actual[-max_value], &desired[-max_value],
                           N - max_value + 1, offset - skipped - max_value);
@@ -133,7 +137,9 @@ Result solveUp(char* actual, const char* desired, int size, int offset) {
             max_value = value;
         }
     }
-    assert(max_value != 0);
+    if (max_value == 0) {
+        throw Bad{};
+    }
 
     std::reverse(&actual[std::get<0>(max_reversal)],
                  &actual[std::get<1>(max_reversal)]);
@@ -150,13 +156,37 @@ Result solveUp(char* actual, const char* desired, int size, int offset) {
     return result;
 }
 
-Result solve(std::string actual, const std::string desired) {
-    // return solveUp(const_cast<char*>(actual.data()), desired.data(),
-    // actual.size(), 0);
-    assert(actual.size() == desired.size());
-    auto size = actual.size();
-    return solveDown(const_cast<char*>(actual.data() + size - 1),
-                     desired.data() + size - 1, size, size - 1);
+Result solve(const std::string& actual_, const std::string& desired) {
+    assert(actual_.size() == desired.size());
+    auto size = actual_.size();
+
+    auto min = 2000;
+    Result bestResult;
+    for (int i = 0; i < size + 1; ++i) {
+        // for (int i = 0; i < size; ++i) {
+        try {
+            std::string actual{actual_};
+            Result result;
+            Result rDown = solveDown(const_cast<char*>(actual.data() + i - 1),
+                                     desired.data() + i - 1, i, i - 1);
+            Result rUp = solveUp(const_cast<char*>(actual.data() + i),
+                                 desired.data() + i, size - i, i);
+            for (const auto& r : rUp) {
+                result.push_back(r);
+            }
+            for (const auto& r : rDown) {
+                result.push_back(r);
+            }
+            if (result.size() < min) {
+                std::cerr << "---" << i << "------------\n";
+                //std::cerr << result;
+                min = result.size();
+                bestResult = result;
+            }
+        } catch (Bad& e) {
+        }
+    }
+    return bestResult;
 }
 
 void test1() {
