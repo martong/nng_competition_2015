@@ -178,8 +178,8 @@ int main() {
             if (rBuffer[bufferIndex++] == '\n') {
                 vector[string_index].length = i + remainingLength;
                 vector[string_index++].data = &array[currentStringBegin];
-                currentStringBegin = index;
                 index += 64 - remainingLength;
+                currentStringBegin = index;
                 remainingLength = 0;
             } else {
                 remainingLength = i;
