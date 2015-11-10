@@ -174,7 +174,7 @@ int main() {
     vector[0] = &array[1];
     std::size_t strlen = 0;
 
-    constexpr int BufSize = 512*1024;
+    constexpr int BufSize = 256*1024;
     std::array<char, BufSize> rBuffer;
     int bytesInBuffer = std::fread(&rBuffer[0], sizeof rBuffer[0],
             rBuffer.size(), stdin);
@@ -183,7 +183,7 @@ int main() {
         int bufferIndex = 0;
         while (bufferIndex < bytesInBuffer) {
             int i = 0;
-            while (rBuffer[bufferIndex + i] != '\n' && bufferIndex + i < bytesInBuffer) ++i;
+            while (rBuffer[bufferIndex + i] != '\n' && bufferIndex + i < bytesInBuffer - 1) ++i;
             std::memcpy(&array[index], &rBuffer[bufferIndex], i);
             index += i;
             bufferIndex += i;
@@ -211,8 +211,8 @@ int main() {
     auto sort_end = Clock::now().time_since_epoch().count();
     std::cerr << "Sort took: " << (sort_end - sort_start) / double(Den) * Num << std::endl;
 
-    constexpr int wBufSize = 512*1024;
-    std::array<char, wBufSize> wBuffer;
+    constexpr int wBufSize = 256*1024;
+    std::array<char, wBufSize+1> wBuffer;
     int wroteToBuffer = 0;
     for (const char* s: vector) {
         std::memcpy(&wBuffer[wroteToBuffer], s, s[-1]);
