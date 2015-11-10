@@ -49,16 +49,11 @@ int alphaToIndex(char c) {
     return c - 'a';
 }
 
-int fstrlen(const char* s) {
-    return *(--s);
-}
-
 // return dth character of s, -1 if d = length of string
-int charAt(const char* s, int d) {
-    const int len = fstrlen(s);
+int charAt(const String& s, int d) {
     //assert(d >= 0 && d <= len);
-    if (d == len) return -1;
-    return alphaToIndex(s[d]);
+    if (d == s.length) return -1;
+    return alphaToIndex(s.data[d]);
 }
 
 void insertion(Strings& a, int lo, int hi, int d);
@@ -120,7 +115,7 @@ void sort(Strings& a, int lo, int hi, int d, Strings& aux) {
 
 void exch(Strings& a, int i, int j);
 
-bool less(const char* v, const char* w, int d);
+bool less(const String& v, const String& w, int d);
 
 // insertion sort a[lo..hi], starting at dth character
 void insertion(Strings& a, int lo, int hi, int d) {
@@ -135,22 +130,13 @@ void exch(Strings& a, int i, int j) {
 }
 
 // is v less than w, starting at character d
-bool less(const char* v, const char* w, int d) {
+bool less(const String& v, const String& w, int d) {
     // assert v.substring(0, d).equals(w.substring(0, d));
-    const int v_len = fstrlen(v);
-    const int w_len = fstrlen(w);
-    for (int i = d; i < std::min(v_len, w_len); i++) {
-        if (v[i] < w[i]) return true;
-        if (v[i] > w[i]) return false;
+    for (int i = d; i < std::min(v.length, w.length); i++) {
+        if (v.data[i] < w.data[i]) return true;
+        if (v.data[i] > w.data[i]) return false;
     }
-    return v_len < w_len;
-}
-
-std::ostream& operator<<(std::ostream& os, const Strings& ss) {
-    for (const auto& s: ss) {
-        os << s << "\n";
-    }
-    return os;
+    return v.length < w.length;
 }
 
 int main() {
@@ -170,14 +156,12 @@ int main() {
     std::vector<char> array;
     //std::cin.rdbuf()->pubsetbuf(Buffer, BufSize);
     array.resize(num * 65);
-    std::vector<const char*> vector;
-    vector.resize(num);
+    Strings vector(num);
     std::size_t string_index = 0; // indexes into vector, refs the nth string
 
     // array[0] contains the length of the 0th string
     std::size_t index = 1; // indexes into array
-    vector[0] = &array[1];
-    std::size_t strlen = 0;
+    vector[0].data = &array[1];
 
     constexpr int BufSize = 512*1024;
     std::array<char, BufSize> rBuffer;
@@ -190,16 +174,15 @@ int main() {
             int i = 0;
             while (rBuffer[bufferIndex + i] != '\n' && bufferIndex + i < bytesInBuffer) ++i;
             std::memcpy(&array[index], &rBuffer[bufferIndex], i);
-            index += i;
             bufferIndex += i;
             if (rBuffer[bufferIndex++] == '\n') {
-                array[strlen] = i + remainingLength;
-                vector[string_index++] = &array[strlen + 1];
-                strlen = index++;
+                vector[string_index].length = i + remainingLength;
+                vector[string_index++].data = &array[index];
                 remainingLength = 0;
             } else {
                 remainingLength = i;
             }
+            index += i;
         }
 
         bytesInBuffer = std::fread(&rBuffer[0], sizeof rBuffer[0],
@@ -219,9 +202,9 @@ int main() {
     constexpr int wBufSize = 512*1024;
     std::array<char, wBufSize> wBuffer;
     int wroteToBuffer = 0;
-    for (const char* s: vector) {
-        std::memcpy(&wBuffer[wroteToBuffer], s, s[-1]);
-        wroteToBuffer += s[-1];
+    for (const String& s: vector) {
+        std::memcpy(&wBuffer[wroteToBuffer], s.data, s.length);
+        wroteToBuffer += s.length;
         wBuffer[wroteToBuffer++] = '\n';
         // TODO branch prediction hint (?)
         if (wBufSize - wroteToBuffer - 64 <= 0) {
