@@ -164,7 +164,7 @@ int main() {
 
     std::vector<char> array;
     //std::cin.rdbuf()->pubsetbuf(Buffer, BufSize);
-    array.resize(num * 66);
+    array.resize(num * 65);
     std::vector<const char*> vector;
     vector.resize(num);
     std::size_t string_index = 0; // indexes into vector, refs the nth string
@@ -189,7 +189,6 @@ int main() {
             bufferIndex += i;
             if (rBuffer[bufferIndex++] == '\n') {
                 array[strlen] = i + remainingLength;
-                array[index++] = '\0';
                 vector[string_index++] = &array[strlen + 1];
                 strlen = index++;
                 remainingLength = 0;
