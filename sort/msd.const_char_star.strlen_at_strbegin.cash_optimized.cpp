@@ -160,14 +160,14 @@ int main() {
     std::size_t string_index = 0; // indexes into vector, refs the nth string
 
     // array[0] contains the length of the 0th string
-    std::size_t index = 1; // indexes into array
-    vector[0].data = &array[1];
+    std::size_t index = 0; // indexes into array
 
     constexpr int BufSize = 512*1024;
     std::array<char, BufSize> rBuffer;
     int bytesInBuffer = std::fread(&rBuffer[0], sizeof rBuffer[0],
             rBuffer.size(), stdin);
     int remainingLength = 0;
+    int currentStringBegin = 0;
     while(bytesInBuffer != 0) {
         int bufferIndex = 0;
         while (bufferIndex < bytesInBuffer) {
@@ -175,14 +175,15 @@ int main() {
             while (rBuffer[bufferIndex + i] != '\n' && bufferIndex + i < bytesInBuffer) ++i;
             std::memcpy(&array[index], &rBuffer[bufferIndex], i);
             bufferIndex += i;
+            index += i;
             if (rBuffer[bufferIndex++] == '\n') {
                 vector[string_index].length = i + remainingLength;
-                vector[string_index++].data = &array[index];
+                vector[string_index++].data = &array[currentStringBegin];
+                currentStringBegin = index;
                 remainingLength = 0;
             } else {
                 remainingLength = i;
             }
-            index += i;
         }
 
         bytesInBuffer = std::fread(&rBuffer[0], sizeof rBuffer[0],
