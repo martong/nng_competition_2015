@@ -187,7 +187,7 @@ int main() {
             std::memcpy(&array[index], &rBuffer[bufferIndex], i);
             index += i;
             bufferIndex += i;
-            if (bufferIndex++ + i < bytesInBuffer) {
+            if (bufferIndex++ < bytesInBuffer) {
                 array[strlen] = i + remainingLength;
                 vector[string_index++] = &array[strlen + 1];
                 strlen = index++;
