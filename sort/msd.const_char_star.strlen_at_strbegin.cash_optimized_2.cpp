@@ -172,10 +172,10 @@ int main() {
         int bufferIndex = 0;
         while (bufferIndex < bytesInBuffer) {
             int i = 0;
-            while (rBuffer[bufferIndex + i] != '\n' && bufferIndex + i < bytesInBuffer - 1) ++i;
+            while (bufferIndex + i < bytesInBuffer && rBuffer[bufferIndex + i] != '\n') ++i;
             std::memcpy(&array[index], &rBuffer[bufferIndex], i);
             bufferIndex += i;
-            if (rBuffer[bufferIndex++] == '\n') {
+            if (bufferIndex++ < bytesInBuffer) {
                 vector[string_index].length = i + remainingLength;
                 vector[string_index++].data = &array[currentStringBegin];
                 index += 64 - remainingLength;
