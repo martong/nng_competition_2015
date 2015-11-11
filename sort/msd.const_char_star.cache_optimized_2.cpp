@@ -190,6 +190,15 @@ int main() {
         bytesInBuffer = std::fread(&rBuffer[0], sizeof rBuffer[0],
                 rBuffer.size(), stdin);
     }
+    std::cerr << array.size() << " " << index << "\n";
+
+    for (const String& s : vector) {
+        assert(s.data < &array[0] + array.size() - 64);
+        assert(s.length <= 64);
+        std::cout.write(s.data, s.length);
+        std::cout << '\n';
+    }
+    return 0;
 
     std::cerr << "read done\n";
 
