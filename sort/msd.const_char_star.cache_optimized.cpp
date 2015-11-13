@@ -162,7 +162,7 @@ int main() {
     // array[0] contains the length of the 0th string
     std::size_t index = 0; // indexes into array
 
-    constexpr int BufSize = 256*1024;
+    constexpr int BufSize = 512*1024;
     char* buffer = new char[BufSize];
     int bytesInBuffer = std::fread(&buffer[0], sizeof buffer[0],
             BufSize, stdin);
