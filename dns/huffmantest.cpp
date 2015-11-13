@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <iostream>
 #include <iterator>
+#include <fstream>
 #include <map>
 #include <string>
 
@@ -28,9 +29,10 @@ int main() {
         ++data[c];
     }
 
-    //for (const auto& p : data) {
-        //std::cout << p.first << ' ' << p.second << std::endl;
-    //}
+    std::cout << "Letters and frequencies : " << std::endl;
+    for (const auto& p : data) {
+        std::cout << (int)p.first << ' ' << p.second << std::endl;
+    }
 
     Node* root = createTree(data);
     //printTree(root);
@@ -97,10 +99,18 @@ int main() {
 
     //std::cout << decodeString(toString(root), p.first, p.second);
 
+    std::ofstream treeofs("dns_tree.txt");
+    treeofs << toString(root);
+    treeofs.close();
+    std::ofstream dataofs("dns_data.txt");
+    dataofs << p.second;
+    dataofs.close();
+
     //    std::string re = decodeString(invCodes, p.first, p.second);
     std::string re = decodeString(toString(root), p.first, p.second);
     //std::cout << '"' << re << '"' << ' ' << (re == input)
     //          << std::endl;
+    std::cout << "bits: " << p.first << std::endl;
     std::cout << (re == input) << ' ' << re.size() << std::endl;
     int index = 0;
     for (char c : input) {
