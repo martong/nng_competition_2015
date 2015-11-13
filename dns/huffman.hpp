@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <map>
 #include <queue>
+#include <fstream>
 
 struct Node {
     Node(char symbol, unsigned probability)
@@ -216,6 +217,26 @@ std::string decodeString(std::map<std::pair<char, std::uint16_t>, char> codes,
     return output;
 }
 
+std::string mapToString(std::map<char, std::pair<char, std::uint16_t>> map) {
+    std::string result;
+    for (const auto& element : map) {
+        result += {element.first, element.second.first,
+                static_cast<char>(element.second.second & 0xff),
+                static_cast<char>(element.second.second >> 8),
+        };
+    }
+    return result;
+}
+
+std::map<std::pair<char, std::uint16_t>, char> stringToMap(std::string data) {
+    std::map<std::pair<char, std::uint16_t>, char> result;
+    assert(data.size() % 4 == 0);
+    for (std::size_t i = 0; i < data.size(); i += 4) {
+        result.insert({{data[i+1], (uint8_t)data[i+2] + (data[i+3] << 8)}, data[i]});
+    }
+    return result;
+}
+
 std::string decodeString(std::string codeTree, unsigned numberOfBits,
         std::string input) {
     std::string output;
@@ -245,33 +266,5 @@ std::string decodeString(std::string codeTree, unsigned numberOfBits,
     }
     return output;
 }
-
-// std::string decodeString(std::string codeTree, unsigned numberOfBits,
-//         std::string input) {
-//     std::string output;
-//     int index = 1;
-//     auto it = codeTree.begin();
-//     std::bitset<8> bitset = *it++;
-//     int bit = 0;
-//     while (numberOfBits > 0) {
-//         while (codeTree[index] == 'n') {
-//             assert(codeTree[index] != 'e');
-//             if (bitset[bit++]) {
-//                 index = index * 2;
-//             } else {
-//                 index = index * 2 + 1;
-//             }
-//             if (bit > 8) {
-//                 bit = 0;
-//                 assert(it != input.end());
-//                 bitset = *it++;
-//             }
-//         }
-//         output.append(1, codeTree[index]);
-//         index = 1;
-//     }
-// //    char bitsSoFar
-//     return output;
-// }
 
 #endif // DNS_HUFFMAN_HPP

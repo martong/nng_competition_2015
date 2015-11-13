@@ -45,11 +45,6 @@ int main() {
                   << std::endl;
     }
 
-    std::map<std::pair<char, std::uint16_t>, char> invCodes;
-    for (const auto& c : codes) {
-        invCodes[c.second] = c.first;
-    }
-
     // for (const auto& c : invCodes) {
     //     std::cout << "{{" << (int)c.first.first << ", " << c.first.second
     //               << "}, " << c.second << "}" << std::endl;
@@ -100,14 +95,16 @@ int main() {
     //std::cout << decodeString(toString(root), p.first, p.second);
 
     std::ofstream treeofs("dns_tree.txt");
-    treeofs << toString(root);
+    treeofs << mapToString(codes);
     treeofs.close();
     std::ofstream dataofs("dns_data.txt");
     dataofs << p.second;
     dataofs.close();
 
-    //    std::string re = decodeString(invCodes, p.first, p.second);
-    std::string re = decodeString(toString(root), p.first, p.second);
+    auto invCodes = stringToMap(mapToString(codes));
+
+    std::string re = decodeString(invCodes, p.first, p.second);
+    //std::string re = decodeString(toString(root), p.first, p.second);
     //std::cout << '"' << re << '"' << ' ' << (re == input)
     //          << std::endl;
     std::cout << "bits: " << p.first << std::endl;
