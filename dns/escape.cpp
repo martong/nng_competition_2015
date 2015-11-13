@@ -19,8 +19,15 @@ int main() {
         {'\r', {"\\r", false}},
         {'"', {"\\\"", false}},
         {'\\', {"\\\\", false}},
-        //{'\0', {"\\0", true}},
+        {'\0', {"\\0", true}},
+        {'\032', {"\\032", false}},
+        //{'\220', {"\220", true}},
+        //{'\0xc2', {"\0xc2", true}},
     };
+for (auto e : escapeSequences) {
+
+std::cerr << (int)e.first << ' ' << e.second.first << ' ' << e.second.second << std::endl;
+}
     while (std::cin.get(reinterpret_cast<char&>(c)).good()) {
         ++n;
         auto it = escapeSequences.find(c);
