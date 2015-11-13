@@ -232,7 +232,7 @@ std::map<std::pair<char, std::uint16_t>, char> stringToMap(std::string data) {
     std::map<std::pair<char, std::uint16_t>, char> result;
     assert(data.size() % 4 == 0);
     for (std::size_t i = 0; i < data.size(); i += 4) {
-        result.insert({{data[i+1], (uint8_t)data[i+2] + (data[i+3] << 8)}, data[i]});
+        result.insert({{data[i+1], (uint16_t&)data[i+2]}, data[i]});
     }
     return result;
 }
