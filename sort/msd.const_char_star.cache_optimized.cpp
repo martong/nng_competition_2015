@@ -163,17 +163,17 @@ int main() {
     std::size_t index = 0; // indexes into array
 
     constexpr int BufSize = 256*1024;
-    std::array<char, BufSize> rBuffer;
-    int bytesInBuffer = std::fread(&rBuffer[0], sizeof rBuffer[0],
-            rBuffer.size(), stdin);
+    char* buffer = new char[BufSize];
+    int bytesInBuffer = std::fread(&buffer[0], sizeof buffer[0],
+            BufSize, stdin);
     int remainingLength = 0;
     int currentStringBegin = 0;
     while(bytesInBuffer != 0) {
         int bufferIndex = 0;
         while (bufferIndex < bytesInBuffer) {
             int i = 0;
-            while (bufferIndex + i < bytesInBuffer && rBuffer[bufferIndex + i] != '\n' ) ++i;
-            std::memcpy(&array[index], &rBuffer[bufferIndex], i);
+            while (bufferIndex + i < bytesInBuffer && buffer[bufferIndex + i] != '\n' ) ++i;
+            std::memcpy(&array[index], &buffer[bufferIndex], i);
             bufferIndex += i;
             index += i;
             if (bufferIndex++ < bytesInBuffer) {
@@ -186,8 +186,8 @@ int main() {
             }
         }
 
-        bytesInBuffer = std::fread(&rBuffer[0], sizeof rBuffer[0],
-                rBuffer.size(), stdin);
+        bytesInBuffer = std::fread(&buffer[0], sizeof buffer[0],
+                BufSize, stdin);
     }
 
     std::cerr << "read done\n";
@@ -200,21 +200,19 @@ int main() {
     auto sort_end = Clock::now().time_since_epoch().count();
     std::cerr << "Sort took: " << (sort_end - sort_start) / double(Den) * Num << std::endl;
 
-    constexpr int wBufSize = 256*1024;
-    std::array<char, wBufSize> wBuffer;
     int wroteToBuffer = 0;
     for (const String& s: vector) {
-        std::memcpy(&wBuffer[wroteToBuffer], s.data, s.length);
+        std::memcpy(&buffer[wroteToBuffer], s.data, s.length);
         wroteToBuffer += s.length;
-        wBuffer[wroteToBuffer++] = '\n';
+        buffer[wroteToBuffer++] = '\n';
         // TODO branch prediction hint (?)
-        if (wBufSize - wroteToBuffer - 64 <= 0) {
-            std::fwrite(&wBuffer[0], sizeof wBuffer[0], wroteToBuffer, stdout);
+        if (BufSize - wroteToBuffer - 64 <= 0) {
+            std::fwrite(&buffer[0], sizeof buffer[0], wroteToBuffer, stdout);
             wroteToBuffer = 0;
         }
     }
-    if (wBufSize - wroteToBuffer - 64 >= 0) {
-        std::fwrite(&wBuffer[0], sizeof wBuffer[0], wroteToBuffer, stdout);
+    if (BufSize - wroteToBuffer - 64 >= 0) {
+        std::fwrite(&buffer[0], sizeof buffer[0], wroteToBuffer, stdout);
         wroteToBuffer = 0;
     }
 
