@@ -136,7 +136,8 @@ void generateCodes(Node* root,
 std::string mapToString(std::map<char, std::pair<char, std::uint16_t>> map) {
     std::string result;
     std::uint16_t s = static_cast<std::uint16_t>(map.size());
-    result += {static_cast<char>(s >> 8), static_cast<char>(s)};
+    std::cerr << "s: " << s << std::endl;
+    result += {static_cast<char>(s), static_cast<char>(s>>8)};
     for (const auto& element : map) {
         result += {element.first, element.second.first,
                 static_cast<char>(element.second.second & 0xff),
@@ -148,7 +149,8 @@ std::string mapToString(std::map<char, std::pair<char, std::uint16_t>> map) {
 
 std::map<std::pair<char, std::uint16_t>, char> stringToMap(std::string data) {
     std::map<std::pair<char, std::uint16_t>, char> result;
-    std::uint16_t s = (data[0]<<8)+data[1];
+    std::uint16_t s = (std::uint16_t&)data[0];
+    std::cerr << "s: " << s << std::endl;
     data = data.substr(2);
     //assert(data.size() % 4 == 0);
     for (std::uint16_t i = 0; i < s*4; i += 4) {
@@ -219,7 +221,7 @@ std::string encodeString(std::string input) {
 
 std::string decodeString(std::string input) {
     std::map<std::pair<char, std::uint16_t>, char >codes = stringToMap(input);
-    input = input.substr(((input[0]<<8)+input[1])*4 + 2);
+    input = input.substr((std::uint16_t&)input[0]*4 + 2);
     unsigned numberOfBits = (unsigned&)input[0];
     input = input.substr(4);
     std::string output;
