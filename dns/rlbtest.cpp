@@ -10,4 +10,8 @@ int main() {
             std::istreambuf_iterator<char>());
     std::vector<int> encoded = rlb::encode(input);
     std::cerr << (input == rlb::decode(encoded)) << ' ' << std::endl;
+    //std::cerr << rlb::decode(encoded) << std::endl;
+
+     std::string encS = rlb::encodeStr(input);
+     std::cerr << (input == rlb::decodeStr(encS)) << ' ' << std::endl;
 }

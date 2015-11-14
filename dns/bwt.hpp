@@ -2,7 +2,7 @@
 #define DNS_BWT_HPP
 
 #include <algorithm>
-//#include <iostream>
+#include <iostream>
 #include <iterator>
 #include <map>
 #include <string>
@@ -12,7 +12,7 @@
 namespace dns {
 //----------------------------------------------------------------------------//
 
-std::tuple<int, std::string> bwt(std::string data) {
+std::string bwt(std::string data) {
     //data.push_back('Z'); // 'EOF' element
     std::vector<std::string> rotations{data.size()};
     rotations[0] = data;
@@ -33,10 +33,12 @@ std::tuple<int, std::string> bwt(std::string data) {
             indexIt = std::find(rotations.begin(), rotations.end(), s);
         }
     }
-    return std::make_tuple(indexIt - rotations.begin(), output);
+    std::uint16_t index = (indexIt - rotations.begin());
+    return std::string{""} + static_cast<char>(index)
+                               + static_cast<char>(index>>8) + output;
 }
 
-std::tuple<std::size_t, std::string> bwt2(std::string data) {
+std::string bwt2(std::string data) {
     //data.push_back('Z'); // 'EOF' element
     //data = "$" + data + "Z";
     std::vector<std::string::iterator> rotations{data.size()};
@@ -72,16 +74,23 @@ std::tuple<std::size_t, std::string> bwt2(std::string data) {
         //         std::string{data.begin(), i}) << std::endl;
         output += (data.begin() == i) ? *--data.end() : *--i;
     }
-    return std::make_tuple(indexIt - rotations.begin(), output);
+
+    std::uint16_t index = indexIt - rotations.begin();
+    //std::cerr << "encoding index: " << index <<  " size: " << output.size() << std::endl;
+    return std::string{""} + static_cast<char>(index) + static_cast<char>(index>>8) +  output;
 }
 
-std::string inverseBwt2(std::size_t index, std::string data) {
+std::string inverseBwt2(std::string data) {
 
-    std::map<char, int> sums;
-    std::map<char, int> cumulativeSums;
+    std::map<unsigned char, int> sums;
+    std::map<unsigned char, int> cumulativeSums;
     std::vector<int> precedingMatchingSymbols;
+    std::uint16_t index = (std::uint16_t&)data[0];
 
-    for (const char& c : data) {
+    data = data.substr(2);
+    //std::cerr << "decoded index: " << index << " size: " << data.size() << std::endl;
+
+    for (const unsigned char& c : data) {
         precedingMatchingSymbols.push_back(sums[c]++);
     }
 

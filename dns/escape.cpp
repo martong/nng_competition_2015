@@ -10,11 +10,11 @@ int main() {
     bool wasNumSequence = false;
     std::size_t n = 0;
     std::map<unsigned char, std::pair<const char*, bool>> escapeSequences = {
-        {'\a', {"\a", false}},
-        {'\b', {"\b", false}},
-        {'\f', {"\f", false}},
-        {'\t', {"\t", false}},
-        {'\v', {"\v", false}},
+        //{'\a', {"\a", false}},
+        //{'\b', {"\b", false}},
+        //{'\f', {"\f", false}},
+        //{'\t', {"\t", false}},
+        //{'\v', {"\v", false}},
         {'\n', {"\\n", false}},
         {'\r', {"\\r", false}},
         {'"', {"\\\"", false}},

@@ -84,7 +84,7 @@ int main() {
     // empty parts of a tree and the
     //std::cout << "'" << toString(root) << "'" << std::endl;
 
-    auto p = encodeString(codes, input);
+    auto p = encodeString(input);
     // for (char c : p.second) {
     //     std::bitset<8> bitset = c;
     //     std::cout << bitset;
@@ -93,21 +93,19 @@ int main() {
     //std::cout << '"' << p.second << '"' << ' ' << p.second.size() << std::endl;
 
     //std::cout << decodeString(toString(root), p.first, p.second);
-
-    std::ofstream treeofs("dns_tree.txt");
-    treeofs << mapToString2(codes);
-    treeofs.close();
-    std::ofstream dataofs("dns_data.txt");
-    dataofs << p.second;
-    dataofs.close();
-
+   // std::ofstream treeofs("dns_tree.txt");
+    // treeofs << mapToString(codes);
+    // treeofs.close();
+    // std::ofstream dataofs("dns_data.txt");
+    // dataofs << p.second;
+    // dataofs.close();
     auto invCodes = stringToMap2(mapToString2(codes));
 
-    std::string re = decodeString(invCodes, p.first, p.second);
+    std::string re = decodeString(p);
     //std::string re = decodeString(toString(root), p.first, p.second);
     //std::cout << '"' << re << '"' << ' ' << (re == input)
     //          << std::endl;
-    std::cout << "bits: " << p.first << std::endl;
+//    std::cout << "bits: " << p.first << std::endl;
     std::cout << (re == input) << ' ' << re.size() << std::endl;
     int index = 0;
     for (char c : input) {

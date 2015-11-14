@@ -50,6 +50,14 @@ Node* createTree(std::map<char, unsigned> probabilities) {
     return nodes.begin()->second;
 }
 
+Node* createTree(std::string input) {
+    std::map<char, unsigned> data;
+    for (char c : input) {
+        ++data[c];
+    }
+    return createTree(data);
+}
+
 int getTreeHeight(Node* root) {
     if (!root) {
         return -1;
@@ -125,8 +133,33 @@ void generateCodes(Node* root,
     }
 }
 
-std::pair<unsigned, std::string> encodeString(std::map<char, std::pair<char,
-        std::uint16_t>> codes, std::string input) {
+std::string mapToString(std::map<char, std::pair<char, std::uint16_t>> map) {
+    std::string result;
+    std::uint16_t s = static_cast<std::uint16_t>(map.size());
+    result += {static_cast<char>(s >> 8), static_cast<char>(s)};
+    for (const auto& element : map) {
+        result += {element.first, element.second.first,
+                static_cast<char>(element.second.second & 0xff),
+                static_cast<char>(element.second.second >> 8),
+        };
+    }
+    return result;
+}
+
+std::map<std::pair<char, std::uint16_t>, char> stringToMap(std::string data) {
+    std::map<std::pair<char, std::uint16_t>, char> result;
+    std::uint16_t s = (data[0]<<8)+data[1];
+    data = data.substr(2);
+    //assert(data.size() % 4 == 0);
+    for (std::uint16_t i = 0; i < s*4; i += 4) {
+        result.insert({{data[i+1], (uint16_t&)data[i+2]}, data[i]});
+    }
+    return result;
+}
+
+std::string encodeString(std::string input) {
+    std::map<char, std::pair<char, std::uint16_t>> codes;
+    generateCodes(createTree(input), codes);
     std::string output;
     unsigned char encoded = 0;
     char bits = 8;
@@ -178,11 +211,17 @@ std::pair<unsigned, std::string> encodeString(std::map<char, std::pair<char,
         encoded <<= bits;
         output.append(1, encoded);
     }
-    return  {numberOfBits, output};
+    return mapToString(codes) + static_cast<char>(numberOfBits)
+        + static_cast<char>(numberOfBits >> 8)
+        + static_cast<char>(numberOfBits >> 16)
+            + static_cast<char>(numberOfBits >> 24) + output;
 }
 
-std::string decodeString(std::map<std::pair<char, std::uint16_t>, char> codes,
-        unsigned numberOfBits, std::string input) {
+std::string decodeString(std::string input) {
+    std::map<std::pair<char, std::uint16_t>, char >codes = stringToMap(input);
+    input = input.substr(((input[0]<<8)+input[1])*4 + 2);
+    unsigned numberOfBits = (unsigned&)input[0];
+    input = input.substr(4);
     std::string output;
     auto it = input.begin();
     std::bitset<8> bitset = *it++;
@@ -215,26 +254,6 @@ std::string decodeString(std::map<std::pair<char, std::uint16_t>, char> codes,
         //std::cout << "numberOfBits: " << numberOfBits << std::endl;
     }
     return output;
-}
-
-std::string mapToString(std::map<char, std::pair<char, std::uint16_t>> map) {
-    std::string result;
-    for (const auto& element : map) {
-        result += {element.first, element.second.first,
-                static_cast<char>(element.second.second & 0xff),
-                static_cast<char>(element.second.second >> 8),
-        };
-    }
-    return result;
-}
-
-std::map<std::pair<char, std::uint16_t>, char> stringToMap(std::string data) {
-    std::map<std::pair<char, std::uint16_t>, char> result;
-    assert(data.size() % 4 == 0);
-    for (std::size_t i = 0; i < data.size(); i += 4) {
-        result.insert({{data[i+1], (uint16_t&)data[i+2]}, data[i]});
-    }
-    return result;
 }
 
 constexpr int valueBits = 8;
