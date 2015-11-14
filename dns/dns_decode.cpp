@@ -5,35 +5,31 @@ char c[] = "z\0ƒ„;††;Œ…;‹;“Œ;•‘;š\r•›’;“; ;¡;£;¦;¨›;ª\r·®œ
 #include <string>
 #include <vector>
 
+using namespace std;
+
 // substitutions:
 // A = char
 // B = unsigned char
 // C = std::uint16_t
+//
 
 int main() {
-    //std::ifstream i("dns_bwt_mtf_huff.txt");
-    //std::string d((std::istreambuf_iterator<char>(i)),
-    //        std::istreambuf_iterator<char>());
-    //char* data = &*d.begin();
 
-    std::string output1;
+    string output1;
     char* input = c;
-    std::map<std::pair<char, std::uint16_t>, char >codes;
-    std::uint16_t s = (std::uint16_t&)input[0];
-    input += 2;// data.substr(2);
-    //assert(data.size() % 4 == 0);
-    for (std::uint16_t i = 0; i < s*4; i += 4)
-        codes[{input[1], (std::uint16_t&)input[2]}]=input[0],
+    map<pair<char, uint16_t>, char >codes;
+    uint16_t s = (uint16_t&)input[0];
+    input += 2;
+    for (uint16_t i = 0; i < s*4; i += 4)
+        codes[{input[1], (uint16_t&)input[2]}]=input[0],
             input+=4;
 
     unsigned numberOfBits = (unsigned&)input[0];
-    //input = input.substr(4);
     input += 4;
-    //auto it = input;//.begin();
-    std::bitset<8> bitset = *input++;
+    bitset<8> bitset = *input++;
     char bit = 7;
     char size = 0;
-    std::uint16_t n = 0;
+    uint16_t n = 0;
     while (numberOfBits > 0) {
         ++size;
         n <<= 1;
@@ -46,17 +42,16 @@ int main() {
         --numberOfBits;
         if (bit == -1 && numberOfBits > 0)
             bit = 7,
-                //assert(it != input.end());
                 bitset = *input++;
 
     }
 
-    std::string output2;
+    string output2;
 
-    std::string alphabet(256,0);
-    for (int i = 0; i < 256; ++i) {
+    string alphabet(256,0);
+    for (int i = 0; i < 256; ++i)
         alphabet[i] = i;
-    }
+
 
     for (unsigned char c : output1) {
         char elem = alphabet[255-c];
@@ -65,37 +60,32 @@ int main() {
         alphabet+=elem;
     }
 
-    std::map<unsigned char, int> sums;
-    std::map<unsigned char, int> cumulativeSums;
-    std::vector<int> precedingMatchingSymbols;
-    std::uint16_t index = (std::uint16_t&)output2[0];
+    map<unsigned char, int> sums;
+    map<unsigned char, int> cumulativeSums;
+    vector<int> precedingMatchingSymbols;
+    uint16_t index = (uint16_t&)output2[0];
 
     output2 = output2.substr(2);
-    //std::cerr << "decoded index: " << index << " size: " << data.size() << std::endl;
 
-    for (unsigned char c : output2) {
+    for (unsigned char c : output2)
         precedingMatchingSymbols.push_back(sums[c]++);
-    }
+
 
     int sum = 0;
-    for (auto p : sums) {
-        cumulativeSums[p.first] = sum;
-        sum += p.second;
-    }
+    for (auto p : sums)
+        cumulativeSums[p.first] = sum,sum += p.second;
+
 
     auto s2 = output2.size();
-    std::string output3(s2, '=');
-    //output[output.size() - 1] = data[index];
+    string output3(s2, '=');
     int m = index;
-    for (auto i = s2-1; (i+s2) >= s2; --i) {
-        output3[i] = output2[m];
-        // std::cout << i << ' ' << output[i] << ' ' << output <<  ' '
-        //           << m << ' ' << data[m] << std::endl;
+    for (auto i = s2-1; (i+s2) >= s2; --i)
+        output3[i] = output2[m],
         m = (precedingMatchingSymbols[m] + cumulativeSums[output3[i]]);
-    }
 
-    char dict[]="ACGT";
-    for (unsigned char c : output3) {
-        std::cout<<dict[c>>6]<<dict[(c&48)>>4]<<dict[(c&12)>>2]<<dict[c&3];
-    }
+
+    char* dict="ACGT";
+    for (unsigned char c : output3)
+        cout<<dict[c>>6]<<dict[(c&48)>>4]<<dict[(c&12)>>2]<<dict[c&3];
+
 }
