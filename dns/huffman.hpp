@@ -237,6 +237,41 @@ std::map<std::pair<char, std::uint16_t>, char> stringToMap(std::string data) {
     return result;
 }
 
+constexpr int valueBits = 8;
+constexpr int lengthBits = 8;
+
+std::string mapToString2(std::map<char, std::pair<char, std::uint16_t>> map) {
+    std::ofstream log{"en.txt"};
+    std::string result;
+    for (const auto& element : map) {
+        log << "{" << (int)element.first << ", {" << (int)element.second.first << ", 0x" <<
+                std::hex << std::setfill('0') << std::setw(4) <<
+                element.second.second << std::dec << std::setw(0) << "}\n";
+        std::uint32_t data = static_cast<unsigned char>(element.first) +
+                (static_cast<unsigned char>(element.second.first) << valueBits) +
+                (element.second.second << (valueBits + lengthBits));
+        unsigned char* charData = reinterpret_cast<unsigned char*>(&data);
+        std::copy(charData, charData + 4, std::back_inserter(result));
+    }
+    return result;
+}
+
+std::map<std::pair<char, std::uint16_t>, char> stringToMap2(std::string data) {
+    std::ofstream log{"de.txt"};
+    std::map<std::pair<char, std::uint16_t>, char> result;
+    assert(data.size() % 4 == 0);
+    for (std::size_t i = 0; i < data.size(); i += 4) {
+        auto num = reinterpret_cast<uint32_t&>(data[i]);
+        auto pushed = result.insert({{(num >> valueBits) & 0xff,
+                        num >> (valueBits + lengthBits)}, num & 0xff});
+        log << "{" << (int)pushed.first->second << ", {" <<
+                (int)pushed.first->first.first << ", 0x" <<
+                std::hex << std::setfill('0') << std::setw(4) <<
+                pushed.first->first.second << std::dec << std::setw(0) << "}\n";
+    }
+    return result;
+}
+
 std::string decodeString(std::string codeTree, unsigned numberOfBits,
         std::string input) {
     std::string output;

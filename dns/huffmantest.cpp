@@ -95,13 +95,13 @@ int main() {
     //std::cout << decodeString(toString(root), p.first, p.second);
 
     std::ofstream treeofs("dns_tree.txt");
-    treeofs << mapToString(codes);
+    treeofs << mapToString2(codes);
     treeofs.close();
     std::ofstream dataofs("dns_data.txt");
     dataofs << p.second;
     dataofs.close();
 
-    auto invCodes = stringToMap(mapToString(codes));
+    auto invCodes = stringToMap2(mapToString2(codes));
 
     std::string re = decodeString(invCodes, p.first, p.second);
     //std::string re = decodeString(toString(root), p.first, p.second);
