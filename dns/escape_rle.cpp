@@ -1,7 +1,13 @@
 #include <iostream>
 #include <iomanip>
 #include <map>
+#include <cstring>
 #include <boost/lexical_cast.hpp>
+
+std::map<char, std::pair<int, int>> overhead;
+int overheadNumSequence = 0;
+int winNum = 0;
+int winAmount = 0;
 
 void finishRun(char rleChar, const std::string& run) {
     static const std::map<unsigned char, std::pair<const char*, bool>>
@@ -14,17 +20,23 @@ void finishRun(char rleChar, const std::string& run) {
         {'\032', {"\\32", true}},
     };
     static bool wasNumSequence = false;
-    if (run.size() > 8 && run[0] == rleChar) {
+    if (run.size() > 7 && run[0] == rleChar) {
         std::cout << "\" N(" << run.size() << ")\"";
+        ++winNum;
+        winAmount += run.size() - 7;
     } else {
         for (char c : run) {
             auto it = escapeSequences.find(c);
             if (it != escapeSequences.end()) {
                 std::cout << it->second.first;
                 wasNumSequence = it->second.second;
+                auto& o = overhead[c];
+                ++o.first;
+                o.second += std::strlen(it->second.first);
             } else if (wasNumSequence && c >= '0' && c <= '9') {
                 std::cout << "\"\"" << c;
                 wasNumSequence = false;
+                overheadNumSequence += 2;
             } else {
                 std::cout << c;
                 wasNumSequence = false;
@@ -47,5 +59,12 @@ int main(int, char* argv[]) {
     }
     finishRun(rleChar, run);
     std::cout << std::dec << "\"";
+    std::cerr << "Overhead:\n";
+    for (const auto& element : overhead) {
+        std::cerr << (int)element.first << ": " << element.second.first <<
+                " (" << element.second.second << ")\n";
+    }
+    std::cerr << "Numeric overhead " << overheadNumSequence << "\n";
+    std::cerr << "Win " << winNum << "(" << winAmount << ")" << "\n";
     return 0;
 }
