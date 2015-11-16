@@ -3,9 +3,7 @@
 #include <map>
 
 int main() {
-    std::cout << R"(#include <iostream>
-int main() {
-    unsigned char c[] = ")";
+    std::cout << "\"";
     unsigned char c;
     bool wasNumSequence = false;
     std::size_t n = 0;
@@ -20,14 +18,13 @@ int main() {
         {'"', {"\\\"", false}},
         {'\\', {"\\\\", false}},
         {'\0', {"\\0", true}},
-        {'\032', {"\\032", false}},
+        {'\032', {"\\32", true}},
         //{'\220', {"\220", true}},
         //{'\0xc2', {"\0xc2", true}},
     };
-for (auto e : escapeSequences) {
-
-std::cerr << (int)e.first << ' ' << e.second.first << ' ' << e.second.second << std::endl;
-}
+    for (auto e : escapeSequences) {
+        std::cerr << (int)e.first << ' ' << e.second.first << ' ' << e.second.second << std::endl;
+    }
     while (std::cin.get(reinterpret_cast<char&>(c)).good()) {
         ++n;
         auto it = escapeSequences.find(c);
@@ -42,10 +39,6 @@ std::cerr << (int)e.first << ' ' << e.second.first << ' ' << e.second.second << 
             wasNumSequence = false;
         }
     }
-    std::cout << std::dec << R"(";
-    for (std::size_t i = 0; i < )" << n << R"(; ++i) {
-        std::cout << c[i];
-    }
-})";
+    std::cout << std::dec << "\"";
     return 0;
 }
