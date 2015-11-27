@@ -7,8 +7,6 @@
 #include "Table.hpp"
 #include <algorithm>
 
-#include "ToString.hpp"
-
 // sample
 
 class MYCLIENT : public CLIENT
@@ -56,9 +54,10 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
 	std::cerr << "r=" << ours[0] << "p=" << ours[1] << "s=" << ours[2] << '\n' <<
 			"R=" << theirs[0] << "P=" << theirs[1] << "S=" << theirs[2] << '\n';
 
+	Soldier toProduce = (Soldier)(std::min_element(ours, ours+2) - ours);
 
 	std::stringstream ss;
-	ss<<"prod R\n";
+	ss<<"prod " << toProduce << "\n";
 	ss<<".";
 	return ss.str();
 }
