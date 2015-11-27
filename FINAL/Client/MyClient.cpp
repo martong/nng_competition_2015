@@ -146,7 +146,18 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
         int defender = 0;
         const auto& soldiersByThisType = soldiersByDistance.at(soldierType);
         for (auto& pair : soldiersByThisType) {
-            if (defender++ < n+A) {
+            if (pair.second == Point{19,19}) {
+                std::make_shared<ConquerStrategy>(pair.second == Point{0, 0});
+            }
+            else if (pair.second == Point{0,19}) {
+                        soldierStrategies[pair.first.id] =
+                            std::make_shared<BaseConquerStrategy>(1);
+            }
+            else if (pair.second == Point{0,19}) {
+                        soldierStrategies[pair.first.id] =
+                            std::make_shared<BaseConquerStrategy>(0);
+            }
+            else if (defender++ < n+A) {
                 soldierStrategies[pair.first.id] =
                     std::make_shared<DefenseStrategy>();
             } else {
