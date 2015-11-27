@@ -3,6 +3,7 @@
 
 #include "Table.hpp"
 #include "PointRange.hpp"
+#include "Random.hpp"
 #include <cstdlib>
 #include <set>
 #include <assert.h>
@@ -12,6 +13,7 @@ Point attackRunOverride(const Table& table, Point p, Point d) {
     assert(std::abs(p.x - d.x) + std::abs(p.y - d.y) == 1);
     assert(table[p]);
     assert(!table[p]->enemy);
+    std::cerr << p << " --> " << d;
     Soldier mySoldier = table[p]->soldier;
     auto destinations = {p - p10, p + p10, p - p01, p + p01};
     std::set<Point> doNotGo;
@@ -23,23 +25,26 @@ Point attackRunOverride(const Table& table, Point p, Point d) {
             doNotGo.insert(pp - p01);
         }
     }
-    for (auto destination : destinations) {
+    for (auto destination : randomizedRange(destinations)) {
         if (!isInsideArray(table, destination)) {
             continue;
         }
-        if (table[destination] && table[destination]->enemy) {
-            if (less(table[destination]->soldier, mySoldier)) {
+        if (table[destination]) {
+            if (table[destination]->enemy &&
+                    less(table[destination]->soldier, mySoldier)) {
+                //std::cerr << "kill " << destination << "\n";
                 return destination;
             }
             doNotGo.insert(destination);
         }
     }
     if (doNotGo.count(d) == 0) {
+        //std::cerr << "OK " << d << "\n";
         return d;
     }
 
-    for (auto destination : destinations) {
-        if (doNotGo.count(d) == 0) {
+    for (auto destination : randomizedRange(destinations)) {
+        if (doNotGo.count(destination) == 0) {
             return destination;
         }
     }

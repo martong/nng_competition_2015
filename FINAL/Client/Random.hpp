@@ -38,4 +38,12 @@ auto findBest(const Range& range, const Predicate& predicate) {
     return elements[num].second;
 }
 
+template<typename Range>
+auto randomizedRange(const Range& range) {
+    std::vector<typename Range::value_type> result;
+    std::copy(range.begin(), range.end(), std::back_inserter(result));
+    std::shuffle(result.begin(), result.end(), rng);
+    return result;
+}
+
 #endif // CLIENT_RANDOM_HPP
