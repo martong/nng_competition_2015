@@ -8,11 +8,14 @@
 #include "Response.hpp"
 #include "AttackRun.hpp"
 #include "Random.hpp"
+#include "Strategy.hpp"
 #include <algorithm>
 #include <random>
 #include  <boost/range/iterator_range_core.hpp>
+#include <unordered_map>
+#include <memory>
 
-// sample
+std::unordered_map<int, std::shared_ptr<BaseStrategy>> soldierStrategies;
 
 class MYCLIENT : public CLIENT
 {
@@ -29,33 +32,20 @@ MYCLIENT::MYCLIENT()
 {
 }
 
-Point move(const Table& table, Point pos, Point dest) {
-	auto candidate_moves = {p10, p01, -p10, -p01};
-	auto min_dist = 1000;
-	Point best;
-	for (auto i : candidate_moves) {
-		Point candidate = pos - i;
-		auto d = distance(dest, candidate);
-		std::cerr << candidate << " " << d << std::endl;
-		if (isInsideArray(table, candidate) && min_dist > d) {
-			best = candidate;
-			min_dist = d;
-			std::cerr << "frissitve " << pos << " " << best << "\n";
-		}
-	}
-	std::cerr << "\n";
-	return best;
-}
-
 std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerResponse)
 {
 	PARSER parser;
 	parser.Parse(ServerResponse);
 	Table table(20, 20);
+
+	// Strategy !!!
 	for (auto soldier : parser.soldiers) {
 		table[Point{soldier.x, soldier.y}] =
 				SoldierData{soldier.id, (Soldier)soldier.t, (bool)soldier.side,
                            SoldierStrategy::offense};
+		if (!soldierStrategies.count(soldier.id)) {
+			soldierStrategies[soldier.id] = std::make_shared<ConquerStrategy>();
+		}
 	}
 	std::cerr << table;
 
@@ -100,8 +90,9 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
 	for (Point p : arrayRange(table)) {
 		const auto& soldier = table[p];
 		if (soldier && !soldier->enemy) {
-			Point stepTo = move(table, p, Point(19,19));
-			stepTo = attackRunOverride(table, p, stepTo);
+			Point stepTo = soldierStrategies.at(soldier->id)->eval(table, p);
+			//Point stepTo = move(table, p, Point(19,19));
+			//stepTo = attackRunOverride(table, p, stepTo);
 			Dir dir = toDir(p, stepTo);
 			ss << soldier->id << " " << dir << "\n";
 		}

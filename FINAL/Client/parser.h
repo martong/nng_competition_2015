@@ -2,6 +2,7 @@
 #define PARSER_H
 
 #include <vector>
+#include <string>
 
 struct SOLDIER {
 	int id, t, x, y, side;
