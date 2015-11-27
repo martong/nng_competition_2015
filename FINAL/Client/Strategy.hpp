@@ -27,7 +27,7 @@ class ConquerStrategy : public BaseStrategy {
     Point chosenBase;
     Point chosenDest;
 public:
-    ConquerStrategy();
+    ConquerStrategy(bool goToBaseFirst);
     virtual Point eval(const Table& table, Point pos) override;
 };
 

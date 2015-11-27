@@ -34,7 +34,7 @@ public:
 protected:
     virtual std::string HandleServerResponse(std::vector<std::string> &ServerResponse);
     virtual std::string GetPassword() { return std::string("4Shwna"); } // ACsillag
-    virtual std::string GetPreferredOpponents() { return std::string("bot"); }
+    virtual std::string GetPreferredOpponents() { return std::string("any"); }
     virtual bool NeedDebugLog() { return true; }
 
 private:
@@ -54,7 +54,7 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
         // no strategy yet
         if (!soldierStrategies.count(soldier.id)) {
             soldierStrategies[soldier.id] =
-                std::make_shared<ConquerStrategy>();
+                std::make_shared<ConquerStrategy>(true);
         }
     }
     std::cerr << table;
@@ -106,7 +106,7 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
                 if (notOwnedBases.empty()) {
                     std::cerr << soldier->id << " defense -> conquer\n";
                     soldierStrategies[soldier->id] =
-                        std::make_shared<ConquerStrategy>();
+                        std::make_shared<ConquerStrategy>(p == Point{0, 0});
                 } else {
                     std::cerr << soldier->id << " defense -> base conquer\n";
                     soldierStrategies[soldier->id] =

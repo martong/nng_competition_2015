@@ -22,10 +22,15 @@ Point move(const Table& table, Point pos, Point dest) {
     return best;
 }
 
-ConquerStrategy::ConquerStrategy() : BaseStrategy(Strategy::Conquer) {
+ConquerStrategy::ConquerStrategy(bool goToBaseFirst)
+        : BaseStrategy(Strategy::Conquer) {
     static std::uniform_int_distribution<std::size_t> dist{0, bases.size() - 1};
     chosenBase = bases[dist(rng)];
-    chosenDest = chosenBase;
+    if (goToBaseFirst) {
+        chosenDest = chosenBase;
+    } else {
+        chosenDest = Point{19, 19};
+    }
 }
 
 Point ConquerStrategy::eval(const Table& table, Point pos) {
