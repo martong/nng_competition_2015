@@ -25,6 +25,6 @@ ConquerStrategy::ConquerStrategy() {
 
 Point ConquerStrategy::eval(const Table& table, Point pos) {
     Point stepTo = move(table, pos, chosenDest);
-    return attackRunOverride(table, pos, stepTo);
+    return attackRunOverride(table, pos, stepTo, false);
 }
 
