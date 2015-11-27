@@ -4,6 +4,7 @@
 #include "Array.hpp"
 #include "ArrayIO.hpp"
 #include "PointRange.hpp"
+#include "Table.hpp"
 
 // sample
 
@@ -24,13 +25,12 @@ MYCLIENT::MYCLIENT()
 
 std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerResponse)
 {
-	static const char* soldierValues[] = {"rps", "RPS"};
 	PARSER parser;
 	parser.Parse(ServerResponse);
-	Array<char> table(20, 20, '.');
+	Table table(20, 20);
 	for (auto soldier : parser.soldiers) {
 		table[Point{soldier.x, soldier.y}] =
-				soldierValues[soldier.side][soldier.t];
+				SoldierData{(Soldier)soldier.t, (bool)soldier.side};
 	}
 	std::cerr << table;
 	std::stringstream ss;

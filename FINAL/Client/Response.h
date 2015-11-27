@@ -13,7 +13,7 @@ struct Step {
 };
 
 enum class Soldier {
-    R, S, P
+    R, P, S
 };
 
 struct Prod {
