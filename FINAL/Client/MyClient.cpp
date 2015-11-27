@@ -73,28 +73,14 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
     std::uniform_int_distribution<int> dist{0, 3};
     std::stringstream ss;
 
-    //for (Point p : arrayRange(table)) {
-        //const auto& soldier = table[p];
-        //if (soldier && !soldier->enemy) {
-            //Dir dir;
-            //do {
-                //dir = (Dir)dist(rng);
-            //} while ((dir == Dir::left && p.x == 0) ||
-                    //(dir == Dir::right && p.x == 19) ||
-                    //(dir == Dir::top && p.y == 0) ||
-                    //(dir == Dir::down && p.y == 19));
-            //ss << soldier->id << " " << dir << "\n";
-        //}
-    //}
-
     for (Point p : arrayRange(table)) {
         const auto& soldier = table[p];
         if (soldier && !soldier->enemy) {
             Point stepTo = soldierStrategies.at(soldier->id)->eval(table, p);
-            //Point stepTo = move(table, p, Point(19,19));
-            //stepTo = attackRunOverride(table, p, stepTo);
-            Dir dir = toDir(p, stepTo);
-            ss << soldier->id << " " << dir << "\n";
+			if (stepTo != p) {
+				Dir dir = toDir(p, stepTo);
+				ss << soldier->id << " " << dir << "\n";
+			}
         }
     }
 
