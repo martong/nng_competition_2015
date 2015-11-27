@@ -70,7 +70,7 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
 				dir = (Dir)dist(rng);
 			} while ((dir == Dir::left && p.x == 0) ||
 					(dir == Dir::right && p.x == 19) ||
-					(dir == Dir::top && p.y == 0) ||
+					(dir == Dir::up && p.y == 0) ||
 					(dir == Dir::down && p.y == 19));
 			ss << soldier->id << " " << dir << "\n";
 		}

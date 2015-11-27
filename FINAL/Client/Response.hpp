@@ -8,7 +8,7 @@
 enum class Dir {
     left,
     right,
-    top,
+    up,
     down
 };
 
