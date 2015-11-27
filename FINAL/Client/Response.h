@@ -1,3 +1,5 @@
+#include "Soldier.hpp"
+
 #include <vector>
 
 enum class Dir {
@@ -10,10 +12,6 @@ enum class Dir {
 struct Step {
     int id;
     Dir dir;
-};
-
-enum class Soldier {
-    R, P, S
 };
 
 struct Response {
