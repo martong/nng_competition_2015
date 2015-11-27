@@ -9,7 +9,8 @@
 #include <assert.h>
 
 inline
-Point attackRunOverride(const Table& table, Point p, Point d) {
+Point attackRunOverride(const Table& table, Point p, Point d,
+        bool suicidal) {
     assert(std::abs(p.x - d.x) + std::abs(p.y - d.y) == 1);
     assert(table[p]);
     assert(!table[p]->enemy);
@@ -18,7 +19,9 @@ Point attackRunOverride(const Table& table, Point p, Point d) {
     auto destinations = {p - p10, p + p10, p - p01, p + p01};
     std::set<Point> doNotGo;
     for (Point pp : arrayRange(table)) {
-        if (table[pp] && table[pp]->enemy && less(mySoldier, table[pp]->soldier)) {
+        if (table[pp] && table[pp]->enemy && (
+                less(mySoldier, table[pp]->soldier) ||
+                        (!suicidal && mySoldier == table[pp]->soldier))) {
             doNotGo.insert(pp + p10);
             doNotGo.insert(pp + p01);
             doNotGo.insert(pp - p10);
@@ -30,8 +33,9 @@ Point attackRunOverride(const Table& table, Point p, Point d) {
             continue;
         }
         if (table[destination]) {
-            if (table[destination]->enemy &&
-                    less(table[destination]->soldier, mySoldier)) {
+            if (table[destination]->enemy && (
+                    less(table[destination]->soldier, mySoldier) ||
+                    (suicidal && table[destination]->soldier == mySoldier))) {
                 //std::cerr << "kill " << destination << "\n";
                 return destination;
             }
