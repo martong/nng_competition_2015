@@ -20,17 +20,18 @@ std::unordered_map<int, std::shared_ptr<BaseStrategy>> soldierStrategies;
 class MYCLIENT : public CLIENT
 {
 public:
-    MYCLIENT();
-protected:
-    virtual std::string HandleServerResponse(std::vector<std::string> &ServerResponse);
-    virtual std::string GetPassword() { return std::string("4Shwna"); } // ACsillag
-    virtual std::string GetPreferredOpponents() { return std::string("bot"); }
-    virtual bool NeedDebugLog() { return true; }
-};
+MYCLIENT() : prodStrategy(new NearestEnemyProdStrategy(Soldier::P)) { // TODO
+    }
 
-MYCLIENT::MYCLIENT()
-{
-}
+protected:
+	virtual std::string HandleServerResponse(std::vector<std::string> &ServerResponse);
+	virtual std::string GetPassword() { return std::string("4Shwna"); } // ACsillag
+	virtual std::string GetPreferredOpponents() { return std::string("bot"); }
+	virtual bool NeedDebugLog() { return true; }
+
+private:
+    IProdStrategy* prodStrategy;
+};
 
 std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerResponse)
 {
@@ -68,7 +69,8 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
     std::cerr << "r=" << ours[0] << "p=" << ours[1] << "s=" << ours[2] << '\n' <<
             "R=" << theirs[0] << "P=" << theirs[1] << "S=" << theirs[2] << '\n';
 
-    Soldier toProduce = (Soldier)(std::min_element(ours, ours+3) - ours);
+	//Soldier toProduce = (Soldier)(std::min_element(ours, ours+2) - ours);
+    Soldier toProduce = prodStrategy->eval(table);
 
     std::uniform_int_distribution<int> dist{0, 3};
     std::stringstream ss;

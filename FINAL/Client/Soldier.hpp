@@ -5,6 +5,14 @@
 
 enum class Soldier { R, P, S };
 
+inline Soldier getGreaterSoldier(Soldier s) {
+    int v = static_cast<int>(s), g = 0;
+    if (v < 2) {
+        g = v + 1;
+    }
+    return static_cast<Soldier>(g);
+}
+
 inline std::ostream& operator<<(std::ostream& out, const Soldier& soldier) {
     static std::string soldierStrings{"RPS"};
     return out << soldierStrings[static_cast<int>(soldier)];
