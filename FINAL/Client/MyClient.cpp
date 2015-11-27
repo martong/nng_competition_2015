@@ -166,17 +166,15 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
                 // Go to the factory
                 soldierStrategies[soldier->id] =
                     std::make_shared<ConquerStrategy>(p == Point{0, 0});
-                for (std::size_t i = 0; i < bases.size(); ++i) {
+                for (const std::size_t i : randomizedRange(notOwnedBases)) {
                     const auto& b = bases[i];
                     const auto& atBase = table[b];
-                    if (atBase) {
-                        // Go to the base
-                        if (atBase->enemy &&
-                            le(atBase->soldier, soldier->soldier)) {
+                    // Go to the base
+                    if (!atBase || (atBase->enemy &&
+                                    less(atBase->soldier, soldier->soldier))) {
 
-                            soldierStrategies[soldier->id] =
-                                std::make_shared<BaseConquerStrategy>(i);
-                        }
+                        soldierStrategies[soldier->id] =
+                            std::make_shared<BaseConquerStrategy>(i);
                     }
                 }
             } else {
