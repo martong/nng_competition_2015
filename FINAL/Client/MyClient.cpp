@@ -82,13 +82,14 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
         const auto& soldier = table[p];
         if (soldier && !soldier->enemy) {
             Point stepTo = soldierStrategies.at(soldier->id)->eval(table, p);
-			if (stepTo != p) {
-				Dir dir = toDir(p, stepTo);
-				ss << soldier->id << " " << dir << "\n";
-				// refresh the table
-				table[p] = boost::none;
-				table[stepTo] = soldier;
-			}
+        std::cerr << p << " --> " << stepTo << "\n";
+            if (stepTo != p) {
+                Dir dir = toDir(p, stepTo);
+                ss << soldier->id << " " << dir << "\n";
+                // refresh the table
+                table[p] = boost::none;
+                table[stepTo] = soldier;
+            }
         }
     }
 

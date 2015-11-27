@@ -14,7 +14,7 @@ Point attackRunOverride(const Table& table, Point p, Point d,
     assert(std::abs(p.x - d.x) + std::abs(p.y - d.y) == 1);
     assert(table[p]);
     assert(!table[p]->enemy);
-    std::cerr << p << " --> " << d;
+    //std::cerr << p << " --> " << d << "\n;
     Soldier mySoldier = table[p]->soldier;
     auto destinations = {p - p10, p + p10, p - p01, p + p01};
     std::set<Point> doNotGo;
@@ -48,7 +48,8 @@ Point attackRunOverride(const Table& table, Point p, Point d,
     }
 
     for (auto destination : randomizedRange(destinations)) {
-        if (doNotGo.count(destination) == 0) {
+        if (isInsideArray(table, destination) && 
+                doNotGo.count(destination) == 0) {
             return destination;
         }
     }
