@@ -6,16 +6,6 @@
 #include <boost/optional.hpp>
 #include <ostream>
 
-struct SoldierData {
-    int id;
-    Soldier soldier;
-    bool enemy;
-};
-
-bool operator==(const SoldierData& lhs, const SoldierData& rhs) {
-    return lhs.soldier == rhs.soldier && lhs.enemy == rhs.enemy;
-}
-
 using TableElement = boost::optional<SoldierData>;
 using Table = Array<TableElement>;
 

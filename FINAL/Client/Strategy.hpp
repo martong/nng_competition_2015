@@ -2,7 +2,7 @@
 #define STRATEGY_HPP
 
 #include "parser.h"
-#include "Response.php"
+#include "Response.hpp"
 
 #include <vector>
 

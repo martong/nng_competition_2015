@@ -1,3 +1,8 @@
+#ifndef PARSER_H
+#define PARSER_H
+
+#include <vector>
+
 struct SOLDIER {
 	int id, t, x, y, side;
 };
@@ -21,3 +26,5 @@ public:
 	eMatchResult match_result;
 	void Parse(const std::vector<std::string> &ServerResponse);
 };
+
+#endif // PARSER_H
