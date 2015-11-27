@@ -112,7 +112,7 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
         soldiersByDistance[localSoldier] = localData;
     }
 
-    const int A = 1;
+    const int A = 0;
     for (int i = 0; i < 3; ++i) {
         auto soldierType = Soldier(i);
 
@@ -121,7 +121,7 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
             for (Point p : arrayRange(table)) {
                 const auto& soldier = table[p];
                 if (soldier && soldier->enemy &&
-                        le(soldierType, soldier->soldier)) {
+                        less(soldierType, soldier->soldier)) {
                     ++count;
                 }
             }
@@ -157,7 +157,7 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
                     const auto& atBase = table[b];
                     // Go to the base
                     if (!atBase || (atBase->enemy &&
-                                    less(atBase->soldier, pair.first.soldier))) {
+                                    le(atBase->soldier, pair.first.soldier))) {
 
                         soldierStrategies[pair.first.id] =
                             std::make_shared<BaseConquerStrategy>(i);
