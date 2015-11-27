@@ -93,30 +93,25 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
     std::uniform_int_distribution<int> dist{0, 3};
     std::stringstream ss;
 
-    std::map<Soldier, std::vector<int>> soldiersByDistance;
+    std::map<Soldier, std::vector<std::pair<SoldierData, Point>>> soldiersByDistance;
     for (int i = 0; i < 3; ++i) {
         auto localSoldier = Soldier(i);
-        std::vector<std::pair<int, Point>> localData;
+        std::vector<std::pair<SoldierData, Point>> localData;
         for (Point p : arrayRange(table)) {
             const auto& elem = table[p];
-            if (elem && !elem->enemy) {
-                localData.push_back({elem->id, p});
+            if (elem && !elem->enemy && elem->soldier == localSoldier) {
+                localData.push_back({*elem, p});
             }
         }
         std::sort(localData.begin(), localData.end(),
-                [](const std::pair<int, Point>& a,
-                        const std::pair<int, Point>& b) {
+                [](const std::pair<SoldierData, Point>& a,
+                        const std::pair<SoldierData, Point>& b) {
                     return distance(Point{0,0}, a.second)
                             < distance(Point{0,0}, b.second);
                 });
-        std::vector<int> finalLocalData;
-        for (const auto& pair : localData) {
-            finalLocalData.push_back(pair.first);
-        }
-        soldiersByDistance[localSoldier] = finalLocalData;
+        soldiersByDistance[localSoldier] = localData;
     }
 
-    std::map<Soldier, std::shared_ptr<BaseStrategy>> strategiesForTypes;
     const int A = 1;
     for (int i = 0; i < 3; ++i) {
         auto soldierType = Soldier(i);
@@ -126,7 +121,7 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
             for (Point p : arrayRange(table)) {
                 const auto& soldier = table[p];
                 if (soldier && soldier->enemy &&
-                    less(soldier->soldier, soldierType)) {
+                        le(soldierType, soldier->soldier)) {
                     ++count;
                 }
             }
@@ -148,51 +143,78 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
 
         auto k = get_k();
 
-        if (k - A > n) {
-            strategiesForTypes[soldierType] =
-                std::make_shared<DefenseStrategy>();
-        } else {
-            strategiesForTypes[soldierType] =
-                std::make_shared<ConquerStrategy>(true);
-        }
-    }
-
-    for (Point p : arrayRange(table)) {
-        const auto& soldier = table[p];
-        if (soldier && !soldier->enemy) {
-            const auto& strat = soldierStrategies.at(soldier->id);
-            const auto& soldierType = strategiesForTypes.at(soldier->soldier);
-            if (soldierType->s == Strategy::Conquer) {
-                // Go to the factory
-                soldierStrategies[soldier->id] =
-                    std::make_shared<ConquerStrategy>(p == Point{0, 0});
+        int defender = 0;
+        const auto& soldiersByThisType = soldiersByDistance.at(soldierType);
+        for (auto& pair : soldiersByThisType) {
+            if (defender++ < n+A) {
+                soldierStrategies[pair.first.id] =
+                    std::make_shared<DefenseStrategy>();
+            } else {
+                soldierStrategies[pair.first.id] =
+                    std::make_shared<ConquerStrategy>(pair.second == Point{0, 0});
                 for (const std::size_t i : randomizedRange(notOwnedBases)) {
                     const auto& b = bases[i];
                     const auto& atBase = table[b];
                     // Go to the base
                     if (!atBase || (atBase->enemy &&
-                                    less(atBase->soldier, soldier->soldier))) {
+                                    less(atBase->soldier, pair.first.soldier))) {
 
-                        soldierStrategies[soldier->id] =
+                        soldierStrategies[pair.first.id] =
                             std::make_shared<BaseConquerStrategy>(i);
                     }
                 }
-            } else {
-                soldierStrategies[soldier->id] =
-                    std::make_shared<DefenseStrategy>();
             }
-
-            Point stepTo = strat->eval(table, p);
-            std::cerr << p << " --> " << stepTo << "\n";
-            if (stepTo != p) {
-                Dir dir = toDir(p, stepTo);
-                ss << soldier->id << " " << dir << "\n";
+            const auto& strat = soldierStrategies.at(pair.first.id);
+            Point stepTo = strat->eval(table, pair.second);
+            std::cerr << pair.second << " --> " << stepTo << "\n";
+            std::cerr << pair.second << " strat: " << int(strat->s) << "\n";
+            if (stepTo != pair.second) {
+                Dir dir = toDir(pair.second, stepTo);
+                ss << pair.first.id << " " << dir << "\n";
                 // refresh the table
-                table[p] = boost::none;
-                table[stepTo] = soldier;
+                table[pair.second] = boost::none;
+                table[stepTo] = pair.first;
             }
         }
+
     }
+
+    //for (Point p : arrayRange(table)) {
+        //const auto& soldier = table[p];
+        //if (soldier && !soldier->enemy) {
+            //const auto& strat = soldierStrategies.at(soldier->id);
+            //const auto& soldierType = strategiesForTypes.at(soldier->soldier);
+            //if (soldierType->s == Strategy::Conquer) {
+                //// Go to the factory
+                //soldierStrategies[soldier->id] =
+                    //std::make_shared<ConquerStrategy>(p == Point{0, 0});
+                //for (const std::size_t i : randomizedRange(notOwnedBases)) {
+                    //const auto& b = bases[i];
+                    //const auto& atBase = table[b];
+                    //// Go to the base
+                    //if (!atBase || (atBase->enemy &&
+                                    //less(atBase->soldier, soldier->soldier))) {
+
+                        //soldierStrategies[soldier->id] =
+                            //std::make_shared<BaseConquerStrategy>(i);
+                    //}
+                //}
+            //} else {
+                //soldierStrategies[soldier->id] =
+                    //std::make_shared<DefenseStrategy>();
+            //}
+
+            //Point stepTo = strat->eval(table, p);
+            //std::cerr << p << " --> " << stepTo << "\n";
+            //if (stepTo != p) {
+                //Dir dir = toDir(p, stepTo);
+                //ss << soldier->id << " " << dir << "\n";
+                //// refresh the table
+                //table[p] = boost::none;
+                //table[stepTo] = soldier;
+            //}
+        //}
+    //}
 
     //for (Point p : arrayRange(table)) {
         //const auto& soldier = table[p];
