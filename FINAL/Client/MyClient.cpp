@@ -20,7 +20,10 @@ std::unordered_map<int, std::shared_ptr<BaseStrategy>> soldierStrategies;
 class MYCLIENT : public CLIENT
 {
 public:
-MYCLIENT() : prodStrategy(new NearestEnemyProdStrategy(Soldier::P)) { // TODO
+    MYCLIENT() : prodStrategy(nullptr) { // TODO
+        std::vector<Soldier> soldiers{Soldier::R, Soldier::P, Soldier::S};
+        auto randomSoldiers = randomizedRange(soldiers);
+        prodStrategy = new NearestEnemyProdStrategy(randomSoldiers[0]);
     }
 
 protected:
