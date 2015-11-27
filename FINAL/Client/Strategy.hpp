@@ -12,10 +12,19 @@
 
 #include <vector>
 #include <numeric>
+#include <ostream>
 
 enum class Strategy {
     Conquer, BaseConquer, Defense
 };
+
+inline std::ostream& operator<<(std::ostream& os, Strategy strategy) {
+   switch (strategy) {
+      case Strategy::Conquer: return os << "C";
+      case Strategy::BaseConquer: return os << "B";
+      case Strategy::Defense: return os << "D";
+   }
+}
 
 struct BaseStrategy {
     Strategy s;

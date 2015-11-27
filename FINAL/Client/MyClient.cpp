@@ -183,7 +183,7 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
             }
 
             Point stepTo = strat->eval(table, p);
-            std::cerr << p << " --> " << stepTo << "\n";
+            std::cerr << p << " --> " << stepTo << "[" << strat->s << "]\n";
             if (stepTo != p) {
                 Dir dir = toDir(p, stepTo);
                 ss << soldier->id << " " << dir << "\n";

@@ -64,13 +64,25 @@ Point BaseConquerStrategy::eval(const Table& table, Point pos) {
 Point DefenseStrategy::eval(const Table& table, Point pos) {
     Soldier type = table[pos]->soldier;
     const Point origin{0, 0};
-    Point nearest{19, 19};
+    std::vector<Point> enemies;
     for (Point p : arrayRange(table)) {
         if (table[p] && table[p]->enemy && (table[p]->soldier == type ||
-                less(table[p]->soldier, type)) &&
-                distance(origin, p) < distance(origin, nearest)) {
-            nearest = p;
+                less(table[p]->soldier, type))) {
+            enemies.push_back(p);
         }
+    }
+    Point nearest;
+    if (enemies.empty()) {
+        nearest = Point{19, 19};
+    } else {
+        nearest = *findBest(enemies, 
+                [&](Point p) {
+                    if (p.x < pos.x && p.y < pos.y) {
+                            return distance(p, origin);
+                        } else {
+                            return distance(p, pos) + 1000;
+                        }
+                });
     }
     Point stepTo = move(table, pos, nearest);
     //std::cerr << "Defense: " << pos << " --> " << nearest << " [" <<
