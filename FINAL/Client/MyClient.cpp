@@ -20,10 +20,12 @@ std::unordered_map<int, std::shared_ptr<BaseStrategy>> soldierStrategies;
 class MYCLIENT : public CLIENT
 {
 public:
-    MYCLIENT() : prodStrategy(nullptr) { // TODO
+    MYCLIENT() : prodStrategy(nullptr) {
         std::vector<Soldier> soldiers{Soldier::R, Soldier::P, Soldier::S};
         auto randomSoldiers = randomizedRange(soldiers);
-        prodStrategy = new NearestEnemyProdStrategy(randomSoldiers[0]);
+        prodStrategy = new RuleBasedProdStrategy(
+                {new NearestEnemyProdRule(10), new GreaterThanMostProdRule(1),
+                            new BalancingProdRule()}, randomSoldiers[0]);
     }
 
 protected:
@@ -74,7 +76,8 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
             "R=" << theirs[0] << "P=" << theirs[1] << "S=" << theirs[2] << '\n';
 
     //Soldier toProduce = (Soldier)(std::min_element(ours, ours+2) - ours);
-    Soldier toProduce = prodStrategy->eval(table, parser.prod);
+    ProdData prodData {table, parser.prod_limit};
+    Soldier toProduce = prodStrategy->eval(prodData, parser.prod);
 
     std::uniform_int_distribution<int> dist{0, 3};
     std::stringstream ss;
