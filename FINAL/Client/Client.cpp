@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Client.h"
 #include <sstream>
+#include <string.h>
+#include <unistd.h>
 #define SERVER_PORT 4242
 
 CLIENT::CLIENT()
@@ -40,7 +42,7 @@ bool CLIENT::Init( std::string aIPAddress )
 	}
 #endif
 	unsigned long addr = inet_addr( aIPAddress.c_str() );
-	sockaddr_in ServerSocketAddress;	
+	sockaddr_in ServerSocketAddress;
 	ServerSocketAddress.sin_addr.s_addr = addr;
 	ServerSocketAddress.sin_family = AF_INET;
 	ServerSocketAddress.sin_port = htons( SERVER_PORT );
@@ -63,7 +65,7 @@ bool CLIENT::Init( std::string aIPAddress )
 		close( mConnectionSocket );
 #endif
 		return false;
-	}	
+	}
 	return true;
 }
 
@@ -80,7 +82,7 @@ void CLIENT::SendMessage( std::string aMessage )
 	if (NeedDebugLog() && mDebugLog.is_open())
 	{
 		mDebugLog<<"Sent: "<<aMessage;
-	}	
+	}
 	int SentBytes = send( mConnectionSocket, aMessage.c_str(), int(aMessage.size()), 0 );
 	if (SentBytes!=aMessage.size())
 	{
@@ -118,7 +120,7 @@ void CLIENT::Run()
 	{
 		mDebugLog.open("debug.log", std::ofstream::out | std::ofstream::app);
 	}
-	
+
 	std::string strLastLineRemaining;
 	std::vector<std::string> LastServerResponse;
 	bool bReceivedFirstPing = false;
@@ -175,7 +177,7 @@ void CLIENT::Run()
 				} else
 				{
 					LastServerResponse.push_back(alma);
-					
+
 					if (alma==".")
 					{
 						if (LastServerResponse.front().substr(0, 7)=="players")
@@ -195,7 +197,7 @@ void CLIENT::Run()
 							}
 						}
 						LastServerResponse.clear();
-					}				
+					}
 				}
 			}
 		}
@@ -230,7 +232,7 @@ int main(int argc, char* argv[])
 		std::cout<<"response: "<<resp <<std::endl;
 	}
 	/**/
-	
+
 	if (!pClient->Init(server_address))
 	{
 		std::cout<<"Connection failed"<<std::endl;

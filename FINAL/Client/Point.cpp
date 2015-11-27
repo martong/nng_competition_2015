@@ -1,4 +1,4 @@
-#include "Status/Point.hpp"
+#include "Point.hpp"
 
 std::string direction(Point d)
 {
