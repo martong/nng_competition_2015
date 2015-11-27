@@ -93,6 +93,28 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
     std::uniform_int_distribution<int> dist{0, 3};
     std::stringstream ss;
 
+    std::map<Soldier, std::vector<int>> soldiersByDistance;
+    for (int i = 0; i < 3; ++i) {
+        auto localSoldier = Soldier(i);
+        std::vector<std::pair<int, Point>> localData;
+        for (Point p : arrayRange(table)) {
+            const auto& elem = table[p];
+            if (elem && !elem->enemy) {
+                localData.push_back({elem->id, p});
+            }
+        }
+        std::sort(localData.begin(), localData.end(),
+                [](const std::pair<int, Point>& a,
+                        const std::pair<int, Point>& b) {
+                    return a.second < b.second;
+                });
+        std::vector<int> finalLocalData;
+        for (const auto& pair : localData) {
+            finalLocalData.push_back(pair.first);
+        }
+        soldiersByDistance[localSoldier] = finalLocalData;
+    }
+
     std::map<Soldier, std::shared_ptr<BaseStrategy>> strategiesForTypes;
     const int A = 1;
     for (int i = 0; i < 3; ++i) {
