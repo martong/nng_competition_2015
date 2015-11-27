@@ -6,6 +6,7 @@
 #include "PointRange.hpp"
 #include "Table.hpp"
 #include "Response.hpp"
+#include "AttackRun.hpp"
 #include <algorithm>
 #include <random>
 
@@ -51,25 +52,26 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
 	Table table(20, 20);
 	for (auto soldier : parser.soldiers) {
 		table[Point{soldier.x, soldier.y}] =
-				SoldierData{soldier.id, (Soldier)soldier.t, (bool)soldier.side};
+				SoldierData{soldier.id, (Soldier)soldier.t, (bool)soldier.side,
+                           SoldierStrategy::offense};
 	}
 	std::cerr << table;
 
 	long ours[] = {
 		std::count(table.begin(), table.end(),
-				SoldierData{0, Soldier::R, false}),
+				SoldierData{0, Soldier::R, false, SoldierStrategy::offense}),
 		std::count(table.begin(), table.end(),
-				SoldierData{0, Soldier::P, false}),
+				SoldierData{0, Soldier::P, false, SoldierStrategy::offense}),
 		std::count(table.begin(), table.end(),
-				SoldierData{0, Soldier::S, false}),
+				SoldierData{0, Soldier::S, false, SoldierStrategy::offense}),
 	};
 	long theirs[] = {
 		std::count(table.begin(), table.end(),
-				SoldierData{0, Soldier::R, true}),
+				SoldierData{0, Soldier::R, true, SoldierStrategy::offense}),
 		std::count(table.begin(), table.end(),
-				SoldierData{0, Soldier::P, true}),
+				SoldierData{0, Soldier::P, true, SoldierStrategy::offense}),
 		std::count(table.begin(), table.end(),
-				SoldierData{0, Soldier::S, true}),
+				SoldierData{0, Soldier::S, true, SoldierStrategy::offense}),
 	};
 	std::cerr << "r=" << ours[0] << "p=" << ours[1] << "s=" << ours[2] << '\n' <<
 			"R=" << theirs[0] << "P=" << theirs[1] << "S=" << theirs[2] << '\n';

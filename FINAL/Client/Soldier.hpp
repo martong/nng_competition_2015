@@ -16,4 +16,20 @@ inline bool less(const Soldier& lhs, const Soldier& rhs) {
             (lhs == Soldier::R && rhs == Soldier::P));
 }
 
+enum class SoldierStrategy {
+    offense, defense, conquer
+};
+
+
+struct SoldierData {
+    int id;
+    Soldier soldier;
+    bool enemy;
+    SoldierStrategy strategy;
+};
+
+inline bool operator==(const SoldierData& lhs, const SoldierData& rhs) {
+    return lhs.soldier == rhs.soldier && lhs.enemy == rhs.enemy;
+}
+
 #endif // SOLDIER_HPP

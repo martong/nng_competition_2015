@@ -1,17 +1,10 @@
+#ifndef CLIENT_TABLE_HPP
+#define CLIENT_TABLE_HPP
+
 #include "Array.hpp"
 #include "Soldier.hpp"
 #include <boost/optional.hpp>
 #include <ostream>
-
-struct SoldierData {
-    int id;
-    Soldier soldier;
-    bool enemy;
-};
-
-bool operator==(const SoldierData& lhs, const SoldierData& rhs) {
-    return lhs.soldier == rhs.soldier && lhs.enemy == rhs.enemy;
-}
 
 using TableElement = boost::optional<SoldierData>;
 using Table = Array<TableElement>;
@@ -37,3 +30,5 @@ inline std::ostream& operator<<(std::ostream& os, TableElement element)  {
     }
     return os << c;
 }
+
+#endif // CLIENT_TABLE_HPP
