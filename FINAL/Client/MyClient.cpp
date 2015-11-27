@@ -23,15 +23,18 @@ public:
     MYCLIENT() : prodStrategy(nullptr) {
         std::vector<Soldier> soldiers{Soldier::R, Soldier::P, Soldier::S};
         auto randomSoldiers = randomizedRange(soldiers);
-        prodStrategy = new RuleBasedProdStrategy(
-                {new NearestEnemyProdRule(10), new GreaterThanMostProdRule(5),
-                            new BalancingProdRule()}, randomSoldiers[0]);
-    }
+       std::initializer_list<IProdRule*> rules = {
+            //new NearestEnemyProdRule(10), new GreaterThanMostProdRule<false>(1),
+            //new BalancingProdRule<true>()
+            new BalancingProdRule<false>(1), new GreaterThanMostProdRule<true>()
+        };
+        prodStrategy = new RuleBasedProdStrategy(rules, randomSoldiers[0]);
+     }
 
 protected:
     virtual std::string HandleServerResponse(std::vector<std::string> &ServerResponse);
     virtual std::string GetPassword() { return std::string("4Shwna"); } // ACsillag
-    virtual std::string GetPreferredOpponents() { return std::string("any"); }
+    virtual std::string GetPreferredOpponents() { return std::string("bot"); }
     virtual bool NeedDebugLog() { return true; }
 
 private:

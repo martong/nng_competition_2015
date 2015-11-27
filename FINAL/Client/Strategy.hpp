@@ -109,19 +109,20 @@ public:
 
     virtual inline Soldier eval(const ProdData& data, int* ongoing) override {
         if (std::accumulate(ongoing, ongoing + 3, 0) == 0) {
+            std::cerr << "Something is finished" << std::endl;
             ongoingProd = getNextProd(data);
         }
-        //std::cerr << "Prod: " << ongoingProd << std::endl;
+        std::cerr << "Prod: " << ongoingProd << std::endl;
         return ongoingProd;
    }
 
 private:
     Soldier getNextProd(const ProdData& data) {
         for (IProdRule* rule : rules) {
-            //std::cerr << "next prod rule..." << std::endl;
+            std::cerr << "next prod rule..." << std::endl;
             rule->setData(data);
             if (rule->isFireable()) {
-                //std::cerr << "prod rule matched" << std::endl;
+                std::cerr << "prod rule matched" << std::endl;
                 return rule->getSoldier();
             }
         }
@@ -174,8 +175,12 @@ private:
     int prodTime;
 };
 
+template<bool DEFAULT>
 class GreaterThanMostProdRule : public IProdRule {
 public:
+    GreaterThanMostProdRule() : threshold(0) {
+    }
+
     explicit GreaterThanMostProdRule(int threshold) : threshold(threshold) {
     }
 
@@ -195,11 +200,14 @@ public:
     }
 
     virtual bool isFireable() override {
-        int max = std::max({
+        if (!DEFAULT) {
+            int max = std::max({
                     std::abs(counters[Soldier::R] - counters[Soldier::P]),
                     std::abs(counters[Soldier::R] - counters[Soldier::S]),
                     std::abs(counters[Soldier::S] - counters[Soldier::P])});
-        return max > threshold;
+            return max > threshold;
+        }
+        return DEFAULT;
     }
 
     virtual Soldier getSoldier() override {
@@ -224,8 +232,15 @@ public:
     }
 };
 
+template<bool DEFAULT>
 class BalancingProdRule : public IProdRule {
 public:
+    BalancingProdRule() : threshold(0) {
+    }
+
+    explicit BalancingProdRule(int threshold) : threshold(threshold) {
+    }
+
     virtual void setData(const ProdData& data) override {
         for (TableElement elem : data.table) {
             if (elem && !elem->enemy) {
@@ -241,11 +256,22 @@ public:
         //std::cerr << "BalancingPR, found min elem: " << soldier << std::endl;
     }
 
+    virtual bool isFireable() override {
+        if (!DEFAULT) {
+            return std::max({std::abs(counters[Soldier::P] - counters[Soldier::R]),
+                                std::abs(counters[Soldier::P] - counters[Soldier::S]),
+                                std::abs(counters[Soldier::R] - counters[Soldier::S])})
+                    > threshold;
+        }
+        return DEFAULT;
+    }
+
     virtual Soldier getSoldier() override {
         return soldier;
     }
 
 private:
+    const int threshold;
     std::map<Soldier, int> counters;
     Soldier soldier;
 };
