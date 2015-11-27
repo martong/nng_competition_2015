@@ -34,7 +34,6 @@ protected:
 
 private:
     IProdStrategy* prodStrategy;
-    int currentSoldier = 0;
 };
 
 std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerResponse)
@@ -83,18 +82,8 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
     for (Point p : arrayRange(table)) {
         const auto& soldier = table[p];
         if (soldier && !soldier->enemy) {
-            const auto& strat = soldierStrategies.at(soldier->id);
-            Point stepTo = strat->eval(table, p);
-            std::cerr << p << " --> " << stepTo << "\n";
-            if (stepTo != p) {
-                Dir dir = toDir(p, stepTo);
-                ss << soldier->id << " " << dir << "\n";
-                // refresh the table
-                table[p] = boost::none;
-                table[stepTo] = soldier;
-            }
-
             // dynamically change the strategy
+            const auto& strat = soldierStrategies.at(soldier->id);
             if (strat->s == Strategy::Conquer && changeToDefense(table, *soldier)) {
                 std::cerr << soldier->id << " conquer -> defense\n";
                 soldierStrategies[soldier->id] =
@@ -105,6 +94,17 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
                 soldierStrategies[soldier->id] =
                     std::make_shared<ConquerStrategy>(Strategy::Conquer);
             }
+
+            Point stepTo = strat->eval(table, p);
+            std::cerr << p << " --> " << stepTo << "\n";
+            if (stepTo != p) {
+                Dir dir = toDir(p, stepTo);
+                ss << soldier->id << " " << dir << "\n";
+                // refresh the table
+                table[p] = boost::none;
+                table[stepTo] = soldier;
+            }
+
         }
     }
 
