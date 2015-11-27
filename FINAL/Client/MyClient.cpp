@@ -29,7 +29,7 @@ public:
 protected:
     virtual std::string HandleServerResponse(std::vector<std::string> &ServerResponse);
     virtual std::string GetPassword() { return std::string("4Shwna"); } // ACsillag
-    virtual std::string GetPreferredOpponents() { return std::string("bot"); }
+    virtual std::string GetPreferredOpponents() { return std::string("any"); }
     virtual bool NeedDebugLog() { return true; }
 
 private:
