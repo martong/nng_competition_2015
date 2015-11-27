@@ -24,14 +24,14 @@ public:
         std::vector<Soldier> soldiers{Soldier::R, Soldier::P, Soldier::S};
         auto randomSoldiers = randomizedRange(soldiers);
         prodStrategy = new RuleBasedProdStrategy(
-                {new NearestEnemyProdRule(10), new GreaterThanMostProdRule(1),
+                {new NearestEnemyProdRule(10), new GreaterThanMostProdRule(5),
                             new BalancingProdRule()}, randomSoldiers[0]);
     }
 
 protected:
     virtual std::string HandleServerResponse(std::vector<std::string> &ServerResponse);
     virtual std::string GetPassword() { return std::string("4Shwna"); } // ACsillag
-    virtual std::string GetPreferredOpponents() { return std::string("bot"); }
+    virtual std::string GetPreferredOpponents() { return std::string("any"); }
     virtual bool NeedDebugLog() { return true; }
 
 private:
