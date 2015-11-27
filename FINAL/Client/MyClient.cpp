@@ -68,7 +68,7 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
     std::cerr << "r=" << ours[0] << "p=" << ours[1] << "s=" << ours[2] << '\n' <<
             "R=" << theirs[0] << "P=" << theirs[1] << "S=" << theirs[2] << '\n';
 
-    Soldier toProduce = (Soldier)(std::min_element(ours, ours+2) - ours);
+    Soldier toProduce = (Soldier)(std::min_element(ours, ours+3) - ours);
 
     std::uniform_int_distribution<int> dist{0, 3};
     std::stringstream ss;
