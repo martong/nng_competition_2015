@@ -3,17 +3,20 @@
 
 #include "parser.h"
 #include "Response.hpp"
+#include "Point.hpp"
+#include "Table.hpp"
 
 #include <vector>
 
-class MoveStrategy {
+class BaseStrategy {
 public:
-    virtual std::vector<Step> evaluate(const PARSER& input) = 0;
+    virtual Point eval(const Table& table, Point pos) = 0;
 };
 
-class ProductionStrategy {
+class ConquerStrategy : public BaseStrategy {
 public:
-    virtual Soldier evaluate(const PARSER& input) = 0;
+    Point chosenBase = Point(19,0);
+    virtual Point eval(const Table& table, Point pos) override;
 };
 
 #endif // STRATEGY_HPP
