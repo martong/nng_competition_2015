@@ -10,6 +10,7 @@
 #include <boost/optional.hpp>
 
 #include <vector>
+#include <numeric>
 
 class BaseStrategy {
 public:
