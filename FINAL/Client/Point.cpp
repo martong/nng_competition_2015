@@ -22,11 +22,11 @@ Dir toDir(const Point& source, const Point& destination) {
     if (diff == p10) {
         return Dir::right;
     } else if (diff == p01) {
-        return Dir::up;
+        return Dir::down;
     } else if (diff == p11) {
         assert(false);
     } else if (diff*-1 == p10) {
-        return Dir::down;
+        return Dir::up;
     } else if (diff*-1 == p01) {
         return Dir::left;
     } else if (diff*-1 == p11) {
