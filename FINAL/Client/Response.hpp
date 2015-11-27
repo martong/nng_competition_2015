@@ -13,7 +13,7 @@ enum class Dir {
 };
 
 std::ostream& operator<<(std::ostream& out, const Dir& direction){
-    static std::vector<std::string> directionStrings{"left", "right", "top",
+    static std::vector<std::string> directionStrings{"left", "right", "up",
                 "down"};
     return out << directionStrings[static_cast<int>(direction)];
 }
