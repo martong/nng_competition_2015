@@ -43,7 +43,8 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
     Table table(20, 20);
 
     // Strategy !!!
-    for (auto soldier : parser.soldiers) {
+    auto randomizedSoldiers = randomizedRange(parser.soldiers);
+    for (auto soldier : randomizedSoldiers) {
         table[Point{soldier.x, soldier.y}] =
                 SoldierData{soldier.id, (Soldier)soldier.t, (bool)soldier.side,
                            SoldierStrategy::offense};
