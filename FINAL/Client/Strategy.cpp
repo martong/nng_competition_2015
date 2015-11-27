@@ -37,3 +37,23 @@ Point ConquerStrategy::eval(const Table& table, Point pos) {
     return attackRunOverride(table, pos, stepTo, false);
 }
 
+DefenseStrategy::DefenseStrategy() {
+}
+
+Point DefenseStrategy::eval(const Table& table, Point pos) {
+    Soldier type = table[pos]->soldier;
+    const Point origin{0, 0};
+    Point nearest{19, 19};
+    for (Point p : arrayRange(table)) {
+        if (table[p] && table[p]->enemy && (table[p]->soldier == type ||
+                less(table[p]->soldier, type)) &&
+                distance(origin, p) < distance(origin, nearest)) {
+            nearest = p;
+        }
+    }
+    Point stepTo = move(table, pos, nearest);
+    std::cerr << "Defense: " << pos << " --> " << nearest << " [" <<
+            pos << "]\n";
+    return attackRunOverride(table, pos, stepTo, true);
+}
+

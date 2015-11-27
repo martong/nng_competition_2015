@@ -27,13 +27,14 @@ public:
     }
 
 protected:
-	virtual std::string HandleServerResponse(std::vector<std::string> &ServerResponse);
-	virtual std::string GetPassword() { return std::string("4Shwna"); } // ACsillag
-	virtual std::string GetPreferredOpponents() { return std::string("bot"); }
-	virtual bool NeedDebugLog() { return true; }
+    virtual std::string HandleServerResponse(std::vector<std::string> &ServerResponse);
+    virtual std::string GetPassword() { return std::string("4Shwna"); } // ACsillag
+    virtual std::string GetPreferredOpponents() { return std::string("bot"); }
+    virtual bool NeedDebugLog() { return true; }
 
 private:
     IProdStrategy* prodStrategy;
+    int currentSoldier = 0;
 };
 
 std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerResponse)
@@ -49,7 +50,11 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
                 SoldierData{soldier.id, (Soldier)soldier.t, (bool)soldier.side,
                            SoldierStrategy::offense};
         if (!soldierStrategies.count(soldier.id)) {
-            soldierStrategies[soldier.id] = std::make_shared<ConquerStrategy>();
+             if ((currentSoldier++ % 3 == 2)) {
+                soldierStrategies[soldier.id] = std::make_shared<ConquerStrategy>();
+             } else {
+                soldierStrategies[soldier.id] = std::make_shared<DefenseStrategy>();
+             }
         }
     }
     std::cerr << table;
@@ -73,7 +78,7 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
     std::cerr << "r=" << ours[0] << "p=" << ours[1] << "s=" << ours[2] << '\n' <<
             "R=" << theirs[0] << "P=" << theirs[1] << "S=" << theirs[2] << '\n';
 
-	//Soldier toProduce = (Soldier)(std::min_element(ours, ours+2) - ours);
+    //Soldier toProduce = (Soldier)(std::min_element(ours, ours+2) - ours);
     Soldier toProduce = prodStrategy->eval(table, parser.prod);
 
     std::uniform_int_distribution<int> dist{0, 3};

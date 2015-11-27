@@ -9,7 +9,6 @@
 
 #include <boost/optional.hpp>
 
-#include <numeric>
 #include <vector>
 
 class BaseStrategy {
@@ -22,6 +21,12 @@ class ConquerStrategy : public BaseStrategy {
     Point chosenDest;
 public:
     ConquerStrategy();
+    virtual Point eval(const Table& table, Point pos) override;
+};
+
+class DefenseStrategy : public BaseStrategy {
+public:
+    DefenseStrategy();
     virtual Point eval(const Table& table, Point pos) override;
 };
 
