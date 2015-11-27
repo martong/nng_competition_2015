@@ -1,8 +1,8 @@
 #ifndef ARRAY_H_
 #define ARRAY_H_
 
-#include "Status/Point.hpp"
-#include "Status/PointRange.hpp"
+#include "Point.hpp"
+#include "PointRange.hpp"
 
 #include "Hash.hpp"
 

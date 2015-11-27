@@ -1,5 +1,5 @@
 #include "Array.hpp"
-#include "Dumper/DumperFunctions.hpp"
+#include "DumperFunctions.hpp"
 #include <ostream>
 
 template<typename T>

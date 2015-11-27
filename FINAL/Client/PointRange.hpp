@@ -1,7 +1,7 @@
 #ifndef POINTRANGE_H_
 #define POINTRANGE_H_
 
-#include "Status/Point.hpp"
+#include "Point.hpp"
 
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/exception/all.hpp>
