@@ -9,6 +9,7 @@
 
 #include <boost/optional.hpp>
 
+#include <numeric>
 #include <vector>
 
 class BaseStrategy {
@@ -25,16 +26,24 @@ public:
 
 class IProdStrategy {
 public:
-    virtual Soldier eval(const Table& table) = 0;
+    virtual Soldier eval(const Table& table, int* ongoing) = 0;
 };
 
 class NearestEnemyProdStrategy : public IProdStrategy {
 public:
     explicit NearestEnemyProdStrategy(Soldier defaultProd)
-            : defaultProd(defaultProd) {
+            : defaultProd(defaultProd),
+              ongoingProd(defaultProd) {
     }
 
-    virtual inline Soldier eval(const Table& table) override {
+    virtual inline Soldier eval(const Table& table, int* ongoing) override {
+        if (std::accumulate(ongoing, ongoing + 3, 0) == 0) {
+            ongoingProd = getNextProd(table);
+        }
+        return ongoingProd;
+    }
+
+    Soldier getNextProd(const Table& table) {
         TableElement none = boost::none;
         for (int i = 0; i < 40; ++i) {
             for (int j = 0; j < i; ++j) {
@@ -50,6 +59,7 @@ public:
 
 private:
     Soldier defaultProd;
+    Soldier ongoingProd;
 };
 
 // inline boost::optional<Point> calculateOffensieTarget(const Point& soldierPosition,
