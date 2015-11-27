@@ -31,7 +31,7 @@ public:
 protected:
     virtual std::string HandleServerResponse(std::vector<std::string> &ServerResponse);
     virtual std::string GetPassword() { return std::string("4Shwna"); } // ACsillag
-    virtual std::string GetPreferredOpponents() { return std::string("any"); }
+    virtual std::string GetPreferredOpponents() { return std::string("bot"); }
     virtual bool NeedDebugLog() { return true; }
 
 private:
@@ -123,42 +123,38 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
 
         if (k - A > n) {
             strategiesForTypes[soldierType] =
-                std::make_shared<DefenseStrategy>(Strategy::Defense);
+                std::make_shared<DefenseStrategy>();
         } else {
             strategiesForTypes[soldierType] =
-                std::make_shared<ConquerStrategy>(Strategy::Conquer);
+                std::make_shared<ConquerStrategy>();
         }
     }
 
     for (Point p : arrayRange(table)) {
         const auto& soldier = table[p];
         if (soldier && !soldier->enemy) {
-            // dynamically change the strategy
             const auto& strat = soldierStrategies.at(soldier->id);
-        }
-    }
+            const auto& soldierType = strategiesForTypes.at(soldier->soldier);
+            if (soldierType->s == Strategy::Conquer) {
+                // Go to the factory
+                soldierStrategies[soldier->id] =
+                    std::make_shared<ConquerStrategy>();
+                for (std::size_t i = 0; i < bases.size(); ++i) {
+                    const auto& b = bases[i];
+                    const auto& atBase = table[b];
+                    if (atBase) {
+                        // Go to the base
+                        if (atBase->enemy &&
+                            le(atBase->soldier, soldier->soldier)) {
 
-    for (Point p : arrayRange(table)) {
-        const auto& soldier = table[p];
-        if (soldier && !soldier->enemy) {
-            // dynamically change the strategy
-            const auto& strat = soldierStrategies.at(soldier->id);
-            if (strat->s == Strategy::Conquer && changeToDefense(table, *soldier)) {
-                std::cerr << soldier->id << " conquer -> defense\n";
+                            soldierStrategies[soldier->id] =
+                                std::make_shared<BaseConquerStrategy>(i);
+                        }
+                    }
+                }
+            } else {
                 soldierStrategies[soldier->id] =
                     std::make_shared<DefenseStrategy>();
-            } else if (strat->s == Strategy::Defense &&
-                       changeToConquer(table, *soldier)) {
-                if (notOwnedBases.empty()) {
-                    std::cerr << soldier->id << " defense -> conquer\n";
-                    soldierStrategies[soldier->id] =
-                        std::make_shared<ConquerStrategy>();
-                } else {
-                    std::cerr << soldier->id << " defense -> base conquer\n";
-                    soldierStrategies[soldier->id] =
-                        std::make_shared<BaseConquerStrategy>(
-                                randomizedRange(notOwnedBases)[0]);
-                }
             }
 
             Point stepTo = strat->eval(table, p);
@@ -170,9 +166,44 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
                 table[p] = boost::none;
                 table[stepTo] = soldier;
             }
-
         }
     }
+
+    //for (Point p : arrayRange(table)) {
+        //const auto& soldier = table[p];
+        //if (soldier && !soldier->enemy) {
+            //// dynamically change the strategy
+            //const auto& strat = soldierStrategies.at(soldier->id);
+            //if (strat->s == Strategy::Conquer && changeToDefense(table, *soldier)) {
+                //std::cerr << soldier->id << " conquer -> defense\n";
+                //soldierStrategies[soldier->id] =
+                    //std::make_shared<DefenseStrategy>();
+            //} else if (strat->s == Strategy::Defense &&
+                       //changeToConquer(table, *soldier)) {
+                //if (notOwnedBases.empty()) {
+                    //std::cerr << soldier->id << " defense -> conquer\n";
+                    //soldierStrategies[soldier->id] =
+                        //std::make_shared<ConquerStrategy>();
+                //} else {
+                    //std::cerr << soldier->id << " defense -> base conquer\n";
+                    //soldierStrategies[soldier->id] =
+                        //std::make_shared<BaseConquerStrategy>(
+                                //randomizedRange(notOwnedBases)[0]);
+                //}
+            //}
+
+            //Point stepTo = strat->eval(table, p);
+            //std::cerr << p << " --> " << stepTo << "\n";
+            //if (stepTo != p) {
+                //Dir dir = toDir(p, stepTo);
+                //ss << soldier->id << " " << dir << "\n";
+                //// refresh the table
+                //table[p] = boost::none;
+                //table[stepTo] = soldier;
+            //}
+
+        //}
+    //}
 
     ss<<"prod " << toProduce << "\n";
     ss<<".";

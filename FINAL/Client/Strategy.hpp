@@ -44,6 +44,8 @@ public:
     virtual Point eval(const Table& table, Point pos) override;
 };
 
+extern std::array<Point, 2> bases;
+
 //============================================================================//
 
 struct ProdData {

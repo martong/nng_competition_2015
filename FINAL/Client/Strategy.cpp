@@ -2,7 +2,7 @@
 #include "AttackRun.hpp"
 #include "Random.hpp"
 
-static std::array<Point, 2> bases{{Point{19, 0}, Point{0, 19}}};
+std::array<Point, 2> bases{{Point{19, 0}, Point{0, 19}}};
 
 Point move(const Table& table, Point pos, Point dest) {
     auto candidate_moves = {p10, p01, -p10, -p01};
