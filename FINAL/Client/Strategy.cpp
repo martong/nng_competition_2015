@@ -9,14 +9,11 @@ Point move(const Table& table, Point pos, Point dest) {
     for (auto i : candidate_moves) {
         Point candidate = pos - i;
         auto d = distance(dest, candidate);
-        std::cerr << candidate << " " << d << std::endl;
         if (isInsideArray(table, candidate) && min_dist > d) {
             best = candidate;
             min_dist = d;
-            std::cerr << "frissitve " << pos << " " << best << "\n";
         }
     }
-    std::cerr << "\n";
     return best;
 }
 
