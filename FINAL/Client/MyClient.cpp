@@ -148,7 +148,7 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
 
         auto k = get_k();
 
-        if (k - A > n) {
+        if (n + A > k) {
             strategiesForTypes[soldierType] =
                 std::make_shared<DefenseStrategy>();
         } else {
