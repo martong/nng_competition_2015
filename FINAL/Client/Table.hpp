@@ -4,6 +4,7 @@
 #include <ostream>
 
 struct SoldierData {
+    int id;
     Soldier soldier;
     bool enemy;
 };
