@@ -72,6 +72,11 @@ inline constexpr bool operator<(Point p1, Point p2) {
     return p1.y < p2.y || (p1.y == p2.y && p1.x < p2.x);
 }
 
+inline int distance(Point p1, Point p2) {
+    auto d = p1 - p2;
+    return abs(d.x) + abs(d.y);
+}
+
 std::string direction(Point d);
 std::ostream& operator<<(std::ostream& os, Point p);
 

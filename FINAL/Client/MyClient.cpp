@@ -26,6 +26,19 @@ MYCLIENT::MYCLIENT()
 {
 }
 
+Point move(const Table&, Point pos, Point dest) {
+	auto candidate_moves = {p10, p01, -p10, -p01};
+	auto min_dist = 1000;
+	Point best;
+	for (auto i : candidate_moves) {
+		Point candidate = pos - i;
+		if (min_dist > distance(dest, candidate)) {
+			best = candidate;
+		}
+	}
+	return best;
+}
+
 std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerResponse)
 {
 	PARSER parser;
@@ -62,19 +75,29 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
     std::uniform_int_distribution<int> dist{0, 3};
 	std::stringstream ss;
 
+	//for (Point p : arrayRange(table)) {
+		//const auto& soldier = table[p];
+		//if (soldier && !soldier->enemy) {
+			//Dir dir;
+			//do {
+				//dir = (Dir)dist(rng);
+			//} while ((dir == Dir::left && p.x == 0) ||
+					//(dir == Dir::right && p.x == 19) ||
+					//(dir == Dir::top && p.y == 0) ||
+					//(dir == Dir::down && p.y == 19));
+			//ss << soldier->id << " " << dir << "\n";
+		//}
+	//}
+
 	for (Point p : arrayRange(table)) {
 		const auto& soldier = table[p];
 		if (soldier && !soldier->enemy) {
 			Dir dir;
-			do {
-				dir = (Dir)dist(rng);
-			} while ((dir == Dir::left && p.x == 0) ||
-					(dir == Dir::right && p.x == 19) ||
-					(dir == Dir::top && p.y == 0) ||
-					(dir == Dir::down && p.y == 19));
-			ss << soldier->id << " " << dir << "\n";
+			Point stepTo = move(table, p, Point(19,19));
+
 		}
 	}
+
 	ss<<"prod " << toProduce << "\n";
 	ss<<".";
 	return ss.str();
