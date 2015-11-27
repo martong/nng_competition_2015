@@ -5,6 +5,7 @@
 #include "ArrayIO.hpp"
 #include "PointRange.hpp"
 #include "Table.hpp"
+#include <algorithm>
 
 // sample
 
@@ -33,6 +34,27 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
 				SoldierData{(Soldier)soldier.t, (bool)soldier.side};
 	}
 	std::cerr << table;
+
+	long ours[] = {
+		std::count(table.begin(), table.end(),
+				SoldierData{Soldier::R, false}),
+		std::count(table.begin(), table.end(),
+				SoldierData{Soldier::P, false}),
+		std::count(table.begin(), table.end(),
+				SoldierData{Soldier::S, false}),
+	};
+	long theirs[] = {
+		std::count(table.begin(), table.end(),
+				SoldierData{Soldier::R, true}),
+		std::count(table.begin(), table.end(),
+				SoldierData{Soldier::P, true}),
+		std::count(table.begin(), table.end(),
+				SoldierData{Soldier::S, true}),
+	};
+	std::cerr << "r=" << ours[0] << "p=" << ours[1] << "s=" << ours[2] << '\n' <<
+			"R=" << theirs[0] << "P=" << theirs[1] << "S=" << theirs[2] << '\n';
+
+
 	std::stringstream ss;
 	ss<<"prod R\n";
 	ss<<".";
