@@ -80,6 +80,9 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
 			if (stepTo != p) {
 				Dir dir = toDir(p, stepTo);
 				ss << soldier->id << " " << dir << "\n";
+				// refresh the table
+				table[p] = boost::none;
+				table[stepTo] = soldier;
 			}
         }
     }
