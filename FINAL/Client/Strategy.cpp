@@ -34,14 +34,15 @@ Point ConquerStrategy::eval(const Table& table, Point pos) {
         return pos;
     }
     // Base reached, go for factory
-    if (pos == chosenBase) {
+    if (pos == chosenBase || (table[chosenBase] && !table[chosenBase]->enemy &&
+                distance(pos, chosenBase) < 2)) {
         chosenDest = Point{19,19};
     }
     Point stepTo = move(table, pos, chosenDest);
     return attackRunOverride(table, pos, stepTo, false);
 }
 
-BaseConquerStrategy::BaseConquerStrategy(std::size_t base) 
+BaseConquerStrategy::BaseConquerStrategy(std::size_t base)
         : BaseStrategy(Strategy::BaseConquer) {
     chosenBase = bases[base];
 }
