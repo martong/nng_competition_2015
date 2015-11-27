@@ -18,12 +18,21 @@ Point move(const Table& table, Point pos, Point dest) {
 }
 
 ConquerStrategy::ConquerStrategy() {
-    static std::array<Point, 3> dests{{Point{19,19}, Point{0,19}, Point{19,0}}};
+    static std::array<Point, 2> dests{{Point{0,19}, Point{19,0}}};
     static std::uniform_int_distribution<std::size_t> dist{0, dests.size() - 1};
-    chosenDest = dests[dist(rng)];
+    chosenBase = dests[dist(rng)];
+    chosenDest = chosenBase;
 }
 
 Point ConquerStrategy::eval(const Table& table, Point pos) {
+    // keep at the factory
+    if (pos == Point{19,19}) {
+        return pos;
+    }
+    // Base reached, go for factory
+    if (pos == chosenBase) {
+        chosenDest = Point{19,19};
+    }
     Point stepTo = move(table, pos, chosenDest);
     return attackRunOverride(table, pos, stepTo, false);
 }

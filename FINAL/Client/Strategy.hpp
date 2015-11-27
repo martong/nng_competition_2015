@@ -18,6 +18,7 @@ public:
 };
 
 class ConquerStrategy : public BaseStrategy {
+    Point chosenBase;
     Point chosenDest;
 public:
     ConquerStrategy();
