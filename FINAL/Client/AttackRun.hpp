@@ -7,6 +7,7 @@
 #include <set>
 #include <assert.h>
 
+inline
 Point attackRunOverride(const Table& table, Point p, Point d) {
     assert(std::abs(p.x - d.x) + std::abs(p.y - d.y) == 1);
     assert(table[p]);

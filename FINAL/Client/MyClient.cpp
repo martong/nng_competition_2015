@@ -7,8 +7,10 @@
 #include "Table.hpp"
 #include "Response.hpp"
 #include "AttackRun.hpp"
+#include "Random.hpp"
 #include <algorithm>
 #include <random>
+#include  <boost/range/iterator_range_core.hpp>
 
 // sample
 
@@ -78,7 +80,6 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
 
 	Soldier toProduce = (Soldier)(std::min_element(ours, ours+2) - ours);
 
-    std::mt19937 rng{std::random_device{}()};
     std::uniform_int_distribution<int> dist{0, 3};
 	std::stringstream ss;
 
