@@ -106,7 +106,8 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
         std::sort(localData.begin(), localData.end(),
                 [](const std::pair<int, Point>& a,
                         const std::pair<int, Point>& b) {
-                    return a.second < b.second;
+                    return distance(Point{0,0}, a.second)
+                            < distance(Point{0,0}, b.second);
                 });
         std::vector<int> finalLocalData;
         for (const auto& pair : localData) {
