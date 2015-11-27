@@ -26,7 +26,8 @@ public:
        std::initializer_list<IProdRule*> rules = {
             //new NearestEnemyProdRule(10), new GreaterThanMostProdRule<false>(1),
             //new BalancingProdRule<true>()
-            new BalancingProdRule<false>(1), new GreaterThanMostProdRule<true>()
+           new BalancingProdRule<false>(1), new GreaterThanMostProdRule<false>(1),
+           new RandomProdRule()
         };
         prodStrategy = new RuleBasedProdStrategy(rules, randomSoldiers[0]);
      }
@@ -34,7 +35,7 @@ public:
 protected:
     virtual std::string HandleServerResponse(std::vector<std::string> &ServerResponse);
     virtual std::string GetPassword() { return std::string("4Shwna"); } // ACsillag
-    virtual std::string GetPreferredOpponents() { return std::string("bot"); }
+    virtual std::string GetPreferredOpponents() { return std::string("any"); }
     virtual bool NeedDebugLog() { return true; }
 
 private:

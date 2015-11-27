@@ -224,14 +224,26 @@ private:
 
 class RandomProdRule : public IProdRule {
 public:
-    virtual void setData(const ProdData& /*data*/) override {
+    virtual void setData(const ProdData& data) override {
+        for (TableElement elem : data.table) {
+            if (elem && elem->enemy) {
+                ++counters[elem->soldier];
+            }
+        }
     }
 
     virtual Soldier getSoldier() override {
         std::vector<Soldier> soldiers{Soldier::R, Soldier::P, Soldier::S};
-        auto randomizedSoldiers = randomizedRange(soldiers);
-        return randomizedSoldiers[0];
+        //auto randomizedSoldiers = randomizedRange(soldiers);
+        //return randomizedSoldiers[0];
+        return *findBest(soldiers,
+                [this](const Soldier& s) -> int {
+                    return -1 * counters[s];
+                });
     }
+
+private:
+    std::map<Soldier, int> counters;
 };
 
 template<bool DEFAULT>
