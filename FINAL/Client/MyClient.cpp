@@ -23,10 +23,13 @@ public:
     MYCLIENT() : prodStrategy(nullptr) {
         std::vector<Soldier> soldiers{Soldier::R, Soldier::P, Soldier::S};
         auto randomSoldiers = randomizedRange(soldiers);
-        prodStrategy = new RuleBasedProdStrategy(
-                {new NearestEnemyProdRule(10), new GreaterThanMostProdRule(5),
-                            new BalancingProdRule()}, randomSoldiers[0]);
-    }
+       std::initializer_list<IProdRule*> rules = {
+            //new NearestEnemyProdRule(10), new GreaterThanMostProdRule<false>(1),
+            //new BalancingProdRule<true>()
+            new BalancingProdRule<false>(1), new GreaterThanMostProdRule<true>()
+        };
+        prodStrategy = new RuleBasedProdStrategy(rules, randomSoldiers[0]);
+     }
 
 protected:
     virtual std::string HandleServerResponse(std::vector<std::string> &ServerResponse);
@@ -51,7 +54,7 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
         // no strategy yet
         if (!soldierStrategies.count(soldier.id)) {
             soldierStrategies[soldier.id] =
-                std::make_shared<ConquerStrategy>();
+                std::make_shared<ConquerStrategy>(true);
         }
     }
     std::cerr << table;
@@ -126,7 +129,7 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
                 std::make_shared<DefenseStrategy>();
         } else {
             strategiesForTypes[soldierType] =
-                std::make_shared<ConquerStrategy>();
+                std::make_shared<ConquerStrategy>(true);
         }
     }
 
@@ -138,7 +141,7 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
             if (soldierType->s == Strategy::Conquer) {
                 // Go to the factory
                 soldierStrategies[soldier->id] =
-                    std::make_shared<ConquerStrategy>();
+                    std::make_shared<ConquerStrategy>(p == Point{0, 0});
                 for (std::size_t i = 0; i < bases.size(); ++i) {
                     const auto& b = bases[i];
                     const auto& atBase = table[b];
