@@ -89,6 +89,55 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
     std::uniform_int_distribution<int> dist{0, 3};
     std::stringstream ss;
 
+    std::map<Soldier, std::shared_ptr<BaseStrategy>> strategiesForTypes;
+    const int A = 1;
+    for (int i = 0; i < 3; ++i) {
+        auto soldierType = Soldier(i);
+
+        auto get_n = [&table, &soldierType]() {
+            int count = 0;
+            for (Point p : arrayRange(table)) {
+                const auto& soldier = table[p];
+                if (soldier && soldier->enemy &&
+                    less(soldier->soldier, soldierType)) {
+                    ++count;
+                }
+            }
+            return count;
+        };
+        auto n = get_n();
+
+        auto get_k = [&table, &soldierType]() {
+            int count = 0;
+            for (Point p : arrayRange(table)) {
+                const auto& soldier = table[p];
+                if (soldier && !soldier->enemy &&
+                    soldier->soldier == soldierType) {
+                    ++count;
+                }
+            }
+            return count;
+        };
+
+        auto k = get_k();
+
+        if (k - A > n) {
+            strategiesForTypes[soldierType] =
+                std::make_shared<DefenseStrategy>(Strategy::Defense);
+        } else {
+            strategiesForTypes[soldierType] =
+                std::make_shared<ConquerStrategy>(Strategy::Conquer);
+        }
+    }
+
+    for (Point p : arrayRange(table)) {
+        const auto& soldier = table[p];
+        if (soldier && !soldier->enemy) {
+            // dynamically change the strategy
+            const auto& strat = soldierStrategies.at(soldier->id);
+        }
+    }
+
     for (Point p : arrayRange(table)) {
         const auto& soldier = table[p];
         if (soldier && !soldier->enemy) {
