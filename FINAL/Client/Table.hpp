@@ -36,6 +36,3 @@ inline std::ostream& operator<<(std::ostream& os, TableElement element)  {
     }
     return os << c;
 }
-
-
-

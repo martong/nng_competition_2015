@@ -7,6 +7,8 @@
 #include "Table.hpp"
 #include <algorithm>
 
+#include "ToString.hpp"
+
 // sample
 
 class MYCLIENT : public CLIENT
