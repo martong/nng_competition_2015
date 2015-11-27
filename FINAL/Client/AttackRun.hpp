@@ -23,6 +23,9 @@ Point attackRunOverride(const Table& table, Point p, Point d) {
         }
     }
     for (auto destination : destinations) {
+        if (!isInsideArray(table, destination)) {
+            continue;
+        }
         if (table[destination] && table[destination]->enemy) {
             if (less(table[destination]->soldier, mySoldier)) {
                 return destination;
