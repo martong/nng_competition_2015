@@ -90,6 +90,8 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
 		const auto& soldier = table[p];
 		if (soldier && !soldier->enemy) {
 			Point stepTo = soldierStrategies.at(soldier->id)->eval(table, p);
+			//Point stepTo = move(table, p, Point(19,19));
+			//stepTo = attackRunOverride(table, p, stepTo);
 			Dir dir = toDir(p, stepTo);
 			ss << soldier->id << " " << dir << "\n";
 		}
