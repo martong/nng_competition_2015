@@ -2,6 +2,8 @@
 #include "AttackRun.hpp"
 #include "Random.hpp"
 
+static std::array<Point, 2> bases{{Point{19, 0}, Point{0, 19}}};
+
 Point move(const Table& table, Point pos, Point dest) {
     auto candidate_moves = {p10, p01, -p10, -p01};
     auto min_dist = 1000;
@@ -20,11 +22,9 @@ Point move(const Table& table, Point pos, Point dest) {
     return best;
 }
 
-ConquerStrategy::ConquerStrategy(Strategy s) : BaseStrategy(s) {
-    assert(s == Strategy::Conquer);
-    static std::array<Point, 2> dests{{Point{0,19}, Point{19,0}}};
-    static std::uniform_int_distribution<std::size_t> dist{0, dests.size() - 1};
-    chosenBase = dests[dist(rng)];
+ConquerStrategy::ConquerStrategy() : BaseStrategy(Strategy::Conquer) {
+    static std::uniform_int_distribution<std::size_t> dist{0, bases.size() - 1};
+    chosenBase = bases[dist(rng)];
     chosenDest = chosenBase;
 }
 
@@ -38,6 +38,20 @@ Point ConquerStrategy::eval(const Table& table, Point pos) {
         chosenDest = Point{19,19};
     }
     Point stepTo = move(table, pos, chosenDest);
+    return attackRunOverride(table, pos, stepTo, false);
+}
+
+BaseConquerStrategy::BaseConquerStrategy(std::size_t base) 
+        : BaseStrategy(Strategy::BaseConquer) {
+    chosenBase = bases[base];
+}
+
+Point BaseConquerStrategy::eval(const Table& table, Point pos) {
+    // Base reached, go for factory
+    if (pos == chosenBase) {
+        return chosenBase;
+    }
+    Point stepTo = move(table, pos, chosenBase);
     return attackRunOverride(table, pos, stepTo, false);
 }
 

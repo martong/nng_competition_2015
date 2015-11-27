@@ -14,7 +14,7 @@
 #include <numeric>
 
 enum class Strategy {
-    Conquer, Defense
+    Conquer, BaseConquer, Defense
 };
 
 struct BaseStrategy {
@@ -27,14 +27,20 @@ class ConquerStrategy : public BaseStrategy {
     Point chosenBase;
     Point chosenDest;
 public:
-    ConquerStrategy(Strategy s);
+    ConquerStrategy();
+    virtual Point eval(const Table& table, Point pos) override;
+};
+
+class BaseConquerStrategy : public BaseStrategy {
+    Point chosenBase;
+public:
+    BaseConquerStrategy(std::size_t base);
     virtual Point eval(const Table& table, Point pos) override;
 };
 
 class DefenseStrategy : public BaseStrategy {
 public:
-    DefenseStrategy();
-    DefenseStrategy(Strategy s) : BaseStrategy(s) { assert(s == Strategy::Defense); }
+    DefenseStrategy() : BaseStrategy(Strategy::Defense) {}
     virtual Point eval(const Table& table, Point pos) override;
 };
 

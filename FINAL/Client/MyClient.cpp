@@ -31,7 +31,7 @@ public:
 protected:
     virtual std::string HandleServerResponse(std::vector<std::string> &ServerResponse);
     virtual std::string GetPassword() { return std::string("4Shwna"); } // ACsillag
-    virtual std::string GetPreferredOpponents() { return std::string("any"); }
+    virtual std::string GetPreferredOpponents() { return std::string("bot"); }
     virtual bool NeedDebugLog() { return true; }
 
 private:
@@ -51,10 +51,17 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
         // no strategy yet
         if (!soldierStrategies.count(soldier.id)) {
             soldierStrategies[soldier.id] =
-                std::make_shared<ConquerStrategy>(Strategy::Conquer);
+                std::make_shared<ConquerStrategy>();
         }
     }
     std::cerr << table;
+
+    std::vector<std::size_t> notOwnedBases;
+    for (std::size_t i = 0; i < 2; ++i) {
+        if (parser.base_owner[i] != 0) {
+            notOwnedBases.push_back(i);
+        }
+    }
 
     long ours[] = {
         std::count(table.begin(), table.end(),
@@ -90,12 +97,19 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
             if (strat->s == Strategy::Conquer && changeToDefense(table, *soldier)) {
                 std::cerr << soldier->id << " conquer -> defense\n";
                 soldierStrategies[soldier->id] =
-                    std::make_shared<DefenseStrategy>(Strategy::Defense);
+                    std::make_shared<DefenseStrategy>();
             } else if (strat->s == Strategy::Defense &&
                        changeToConquer(table, *soldier)) {
-                std::cerr << soldier->id << " defense -> conquer\n";
-                soldierStrategies[soldier->id] =
-                    std::make_shared<ConquerStrategy>(Strategy::Conquer);
+                if (notOwnedBases.empty()) {
+                    std::cerr << soldier->id << " defense -> conquer\n";
+                    soldierStrategies[soldier->id] =
+                        std::make_shared<ConquerStrategy>();
+                } else {
+                    std::cerr << soldier->id << " defense -> base conquer\n";
+                    soldierStrategies[soldier->id] =
+                        std::make_shared<BaseConquerStrategy>(
+                                randomizedRange(notOwnedBases)[0]);
+                }
             }
 
             Point stepTo = strat->eval(table, p);
