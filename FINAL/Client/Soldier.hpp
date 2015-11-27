@@ -24,16 +24,23 @@ inline bool less(const Soldier& lhs, const Soldier& rhs) {
             (lhs == Soldier::R && rhs == Soldier::P));
 }
 
-enum class SoldierStrategy {
-    offense, defense, conquer
-};
+inline bool greater(const Soldier& lhs, const Soldier& rhs) {
+    return less(rhs, lhs);
+}
+
+inline bool le(const Soldier& lhs, const Soldier& rhs) {
+    return less(lhs, rhs) || lhs == rhs;
+}
+
+inline bool ge(const Soldier& lhs, const Soldier& rhs) {
+    return greater(lhs, rhs) || lhs == rhs;
+}
 
 
 struct SoldierData {
     int id;
     Soldier soldier;
     bool enemy;
-    SoldierStrategy strategy;
 };
 
 inline bool operator==(const SoldierData& lhs, const SoldierData& rhs) {

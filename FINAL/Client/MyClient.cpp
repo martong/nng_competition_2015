@@ -43,37 +43,33 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
     parser.Parse(ServerResponse);
     Table table(20, 20);
 
-    // Strategy !!!
     auto randomizedSoldiers = randomizedRange(parser.soldiers);
     for (auto soldier : randomizedSoldiers) {
         table[Point{soldier.x, soldier.y}] =
-                SoldierData{soldier.id, (Soldier)soldier.t, (bool)soldier.side,
-                           SoldierStrategy::offense};
+                SoldierData{soldier.id, (Soldier)soldier.t, (bool)soldier.side};
+        // no strategy yet
         if (!soldierStrategies.count(soldier.id)) {
-             if ((currentSoldier++ % 3 == 2)) {
-                soldierStrategies[soldier.id] = std::make_shared<ConquerStrategy>();
-             } else {
-                soldierStrategies[soldier.id] = std::make_shared<DefenseStrategy>();
-             }
+            soldierStrategies[soldier.id] =
+                std::make_shared<ConquerStrategy>(Strategy::Conquer);
         }
     }
     std::cerr << table;
 
     long ours[] = {
         std::count(table.begin(), table.end(),
-                SoldierData{0, Soldier::R, false, SoldierStrategy::offense}),
+                SoldierData{0, Soldier::R, false}),
         std::count(table.begin(), table.end(),
-                SoldierData{0, Soldier::P, false, SoldierStrategy::offense}),
+                SoldierData{0, Soldier::P, false}),
         std::count(table.begin(), table.end(),
-                SoldierData{0, Soldier::S, false, SoldierStrategy::offense}),
+                SoldierData{0, Soldier::S, false}),
     };
     long theirs[] = {
         std::count(table.begin(), table.end(),
-                SoldierData{0, Soldier::R, true, SoldierStrategy::offense}),
+                SoldierData{0, Soldier::R, true}),
         std::count(table.begin(), table.end(),
-                SoldierData{0, Soldier::P, true, SoldierStrategy::offense}),
+                SoldierData{0, Soldier::P, true}),
         std::count(table.begin(), table.end(),
-                SoldierData{0, Soldier::S, true, SoldierStrategy::offense}),
+                SoldierData{0, Soldier::S, true}),
     };
     std::cerr << "r=" << ours[0] << "p=" << ours[1] << "s=" << ours[2] << '\n' <<
             "R=" << theirs[0] << "P=" << theirs[1] << "S=" << theirs[2] << '\n';
@@ -87,14 +83,27 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
     for (Point p : arrayRange(table)) {
         const auto& soldier = table[p];
         if (soldier && !soldier->enemy) {
-            Point stepTo = soldierStrategies.at(soldier->id)->eval(table, p);
-        std::cerr << p << " --> " << stepTo << "\n";
+            const auto& strat = soldierStrategies.at(soldier->id);
+            Point stepTo = strat->eval(table, p);
+            std::cerr << p << " --> " << stepTo << "\n";
             if (stepTo != p) {
                 Dir dir = toDir(p, stepTo);
                 ss << soldier->id << " " << dir << "\n";
                 // refresh the table
                 table[p] = boost::none;
                 table[stepTo] = soldier;
+            }
+
+            // dynamically change the strategy
+            if (strat->s == Strategy::Conquer && changeToDefense(table, *soldier)) {
+                std::cerr << soldier->id << " conquer -> defense\n";
+                soldierStrategies[soldier->id] =
+                    std::make_shared<DefenseStrategy>(Strategy::Defense);
+            } else if (strat->s == Strategy::Defense &&
+                       changeToConquer(table, *soldier)) {
+                std::cerr << soldier->id << " defense -> conquer\n";
+                soldierStrategies[soldier->id] =
+                    std::make_shared<ConquerStrategy>(Strategy::Conquer);
             }
         }
     }

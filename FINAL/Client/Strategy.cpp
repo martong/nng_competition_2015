@@ -20,7 +20,8 @@ Point move(const Table& table, Point pos, Point dest) {
     return best;
 }
 
-ConquerStrategy::ConquerStrategy() {
+ConquerStrategy::ConquerStrategy(Strategy s) : BaseStrategy(s) {
+    assert(s == Strategy::Conquer);
     static std::array<Point, 2> dests{{Point{0,19}, Point{19,0}}};
     static std::uniform_int_distribution<std::size_t> dist{0, dests.size() - 1};
     chosenBase = dests[dist(rng)];
@@ -40,9 +41,6 @@ Point ConquerStrategy::eval(const Table& table, Point pos) {
     return attackRunOverride(table, pos, stepTo, false);
 }
 
-DefenseStrategy::DefenseStrategy() {
-}
-
 Point DefenseStrategy::eval(const Table& table, Point pos) {
     Soldier type = table[pos]->soldier;
     const Point origin{0, 0};
@@ -58,5 +56,30 @@ Point DefenseStrategy::eval(const Table& table, Point pos) {
     //std::cerr << "Defense: " << pos << " --> " << nearest << " [" <<
             //stepTo << "]\n";
     return attackRunOverride(table, pos, stepTo, true);
+}
+
+bool changeToDefense(const Table& table, const SoldierData& friendly) {
+    for (Point p : arrayRange(table)) {
+        const auto& soldier = table[p];
+        if (soldier && soldier->enemy) {
+            if (le(soldier->soldier, friendly.soldier)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool changeToConquer(const Table& table, const SoldierData& friendly) {
+    auto range = arrayRange(table);
+    return std::all_of(
+        range.begin(), range.end(), [&table, &friendly](Point p) {
+            const auto& soldier = table[p];
+            if (soldier && soldier->enemy) {
+                return greater(soldier->soldier, friendly.soldier);
+            } else {
+                return true;
+            }
+        });
 }
 

@@ -12,8 +12,13 @@
 #include <vector>
 #include <numeric>
 
-class BaseStrategy {
-public:
+enum class Strategy {
+    Conquer, Defense
+};
+
+struct BaseStrategy {
+    Strategy s;
+    BaseStrategy(Strategy s) : s(s) {}
     virtual Point eval(const Table& table, Point pos) = 0;
 };
 
@@ -21,13 +26,14 @@ class ConquerStrategy : public BaseStrategy {
     Point chosenBase;
     Point chosenDest;
 public:
-    ConquerStrategy();
+    ConquerStrategy(Strategy s);
     virtual Point eval(const Table& table, Point pos) override;
 };
 
 class DefenseStrategy : public BaseStrategy {
 public:
     DefenseStrategy();
+    DefenseStrategy(Strategy s) : BaseStrategy(s) { assert(s == Strategy::Defense); }
     virtual Point eval(const Table& table, Point pos) override;
 };
 
@@ -82,5 +88,8 @@ private:
 
 //     return boost::none;
 // }
+
+bool changeToDefense(const Table& table, const SoldierData& friendly);
+bool changeToConquer(const Table& table, const SoldierData& friendly);
 
 #endif // STRATEGY_HPP
