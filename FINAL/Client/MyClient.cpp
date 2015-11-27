@@ -6,6 +6,7 @@
 #include "PointRange.hpp"
 #include "Table.hpp"
 #include "Response.hpp"
+#include "AttackRun.hpp"
 #include <algorithm>
 #include <random>
 

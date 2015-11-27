@@ -1,3 +1,6 @@
+#ifndef CLIENT_TABLE_HPP
+#define CLIENT_TABLE_HPP
+
 #include "Array.hpp"
 #include "Soldier.hpp"
 #include <boost/optional.hpp>
@@ -37,3 +40,5 @@ inline std::ostream& operator<<(std::ostream& os, TableElement element)  {
     }
     return os << c;
 }
+
+#endif // CLIENT_TABLE_HPP
