@@ -16,9 +16,7 @@ enum class Soldier {
     R, P, S
 };
 
-struct Prod {
-};
-
 struct Response {
     std::vector<Step> steps;
+    Soldier production;
 };
