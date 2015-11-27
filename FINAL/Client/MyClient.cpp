@@ -92,9 +92,9 @@ std::string MYCLIENT::HandleServerResponse(std::vector<std::string> &ServerRespo
 	for (Point p : arrayRange(table)) {
 		const auto& soldier = table[p];
 		if (soldier && !soldier->enemy) {
-			Dir dir;
 			Point stepTo = move(table, p, Point(19,19));
-
+			Dir dir = toDir(p, stepTo);
+			ss << soldier->id << " " << dir << "\n";
 		}
 	}
 

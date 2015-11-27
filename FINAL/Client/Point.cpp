@@ -1,5 +1,7 @@
 #include "Point.hpp"
 
+#include <cassert>
+
 std::string direction(Point d)
 {
     return
@@ -15,3 +17,21 @@ std::ostream& operator<<(std::ostream& os, Point p)
     return os;
 }
 
+Dir toDir(const Point& source, const Point& destination) {
+    Point diff = destination - source;
+    if (diff == p10) {
+        return Dir::right;
+    } else if (diff == p01) {
+        return Dir::up;
+    } else if (diff == p11) {
+        assert("p11 is not a valid move");
+    } else if (diff*-1 == p10) {
+        return Dir::down;
+    } else if (diff*-1 == p01) {
+        return Dir::left;
+    } else if (diff*-1 == p11) {
+        assert("-p11 is not a valid move");
+    } else {
+        assert("No direction can be derived!");
+    }
+}

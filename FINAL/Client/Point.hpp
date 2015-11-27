@@ -2,6 +2,7 @@
 #define POINT_H_
 
 #include "Hash.hpp"
+#include "Response.hpp"
 
 #include <ostream>
 #include <stddef.h>
@@ -79,6 +80,7 @@ inline int distance(Point p1, Point p2) {
 
 std::string direction(Point d);
 std::ostream& operator<<(std::ostream& os, Point p);
+Dir toDir(const Point& source, const Point& destination);
 
 namespace std {
 
