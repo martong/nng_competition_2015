@@ -9,11 +9,14 @@ Point move(const Table& table, Point pos, Point dest) {
     for (auto i : candidate_moves) {
         Point candidate = pos - i;
         auto d = distance(dest, candidate);
+        std::cerr << "  " << candidate << "[" << d << "]\n";
         if (isInsideArray(table, candidate) && min_dist > d) {
+            std::cerr << "  update\n";
             best = candidate;
             min_dist = d;
         }
     }
+    std::cerr << "  --> " << best << "\n";
     return best;
 }
 
@@ -53,7 +56,7 @@ Point DefenseStrategy::eval(const Table& table, Point pos) {
     }
     Point stepTo = move(table, pos, nearest);
     std::cerr << "Defense: " << pos << " --> " << nearest << " [" <<
-            pos << "]\n";
+            stepTo << "]\n";
     return attackRunOverride(table, pos, stepTo, true);
 }
 
