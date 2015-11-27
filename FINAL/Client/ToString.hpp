@@ -1,7 +1,7 @@
 #ifndef TOSTRING_HPP
 #define TOSTRING_HPP
 
-#include "Soldier.hpp"
+#include "Response.hpp"
 
 #include <string>
 #include <sstream>
